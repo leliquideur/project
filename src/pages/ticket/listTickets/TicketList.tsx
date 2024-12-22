@@ -140,14 +140,14 @@ export function TicketList() {
               <tr
                 key={ticket.id}
                 className="text-center p-3 cursor-pointer hover:bg-gray-100"
-                onClick={() => navigate(`/ticket/${ticket.id}`)}
+                onClick={() => navigate(`/tickets/${ticket.id}`)}
               >
-                <td className="border px-4 py-2 truncate w-10">
+                <td className="border px-4 py-2 truncate w-30">
                   {ticket.title.length > 30
                     ? `${ticket.title.substring(0, 30)}...`
                     : ticket.title}
                 </td>
-                <td className="border px-4 py-2 truncate w-10 overflow-ellipsis overflow-hidden">
+                <td className="border px-4 py-2 truncate w-30 overflow-ellipsis overflow-hidden">
                   {ticket.description.length > 30
                     ? `${ticket.description.substring(0, 30)}...`
                     : ticket.description}
