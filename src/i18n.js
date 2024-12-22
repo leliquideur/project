@@ -18,9 +18,10 @@ i18n
   .use(initReactI18next) // Passer i18n instance à react-i18next
   .init({
     resources,
-    fallbackLng: 'en', // Utiliser l'anglais si la langue détectée n'est pas disponible
+    fallbackLng: 'fr', // Utiliser le français si la langue détectée n'est pas disponible
     detection: {
-      order: ['navigator'], // Détecter la langue à partir du navigateur
+      order: ['querystring', 'localStorage', 'navigator'], // Détecter la langue à partir du querystring, localStorage, et navigateur
+      caches: ['localStorage'] // Mettre en cache la langue détectée dans localStorage
     },
     interpolation: {
       escapeValue: false, // React se charge déjà de l'échappement des valeurs

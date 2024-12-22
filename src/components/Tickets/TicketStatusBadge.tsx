@@ -1,5 +1,5 @@
 import React from 'react';
-import type { TicketStatus } from '../types';
+import type { TicketStatus } from '../../types';
 
 const statusColors: Record<TicketStatus, { bg: string; text: string }> = {
   new: { bg: 'bg-blue-100', text: 'text-blue-800' },

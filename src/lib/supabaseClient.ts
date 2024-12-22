@@ -5,4 +5,19 @@ const supabaseKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZS
 
 const supabase = createClient(supabaseUrl, supabaseKey);
 
+supabase.auth.getSession()
+  .then(({ data, error }) => {
+    if (error) {
+      console.error('Erreur de connexion à Supabase:', error.message);
+    } else {
+      console.log('Connexion à Supabase réussie:', data);
+      const user = data.session?.user;
+      if (user) {
+        console.log('Utilisateur connecté:', user);
+      } else {
+        console.log('Aucun utilisateur connecté.');
+      }
+    }
+  });
+
 export default supabase;

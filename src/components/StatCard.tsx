@@ -2,7 +2,7 @@ import React from "react";
 
 interface StatCardProps {
   title: string;
-  value: number;
+  value: number|null;
   icon: React.ElementType;
   color: string;
   bgColor: string;

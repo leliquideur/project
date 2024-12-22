@@ -5,8 +5,8 @@ import supabase from "../../lib/supabaseClient";
 
 export function Login() {
   const { t } = useTranslation();
-  const [email, setEmail] = useState("Christophedu13140@hotmail.fr"); // Valeur forcée
-  const [password, setPassword] = useState("aze321aze"); // Valeur forcée
+  const [email, setEmail] = useState("le.liquideur01@gmail.com"); // Valeur forcée
+  const [password, setPassword] = useState("Jesuisici13"); // Valeur forcée
   const [error, setError] = useState("");
 
   const handleSubmit = async (e: React.FormEvent) => {
