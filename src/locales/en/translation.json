@@ -15,5 +15,39 @@
   },
   "layout": {
       "invalidPath": "Wrong path. You have been redirected to the home page."
+  },
+  "Ticket": {
+    "title": "Tickets",
+    "newTicket": "New Ticket",
+    "search": "Search",
+    "searchPlaceholder": "Search by ticket number",
+    "ticketNumber": "Ticket Number",
+    "status": "Status",
+    "priority": "Priority",
+    "subject": "Subject",
+    "assignee": "Assignee",
+    "created": "Created",
+    "updated": "Updated",
+    "actions": "Actions",
+    "noTickets": "No tickets found",
+    "description": "Description",
+    "type": "Type",
+    "createdAt": "Created at",
+    "priority_high": "High",
+    "priority_medium": "Medium",
+    "priority_low": "Low",
+    "status_new": "Open",
+    "status_in_progress": "In Progress",
+    "status_closed": "Closed",
+    "status_pending": "Pending",
+    "status_resolved": "Resolved",
+    "status_rejected": "Rejected",
+    "date": "en-US",
+    "type_problem": "Problem",
+    "type_service_request": "Service Request",
+    "type_task": "Question",
+    "previous": "Previous",
+    "next": "Next"
+    
   }
 }

@@ -69,7 +69,7 @@ function App() {
             </Route>
             <Route
               path="*"
-              element={<Navigate to="/login?error=invalid-path" />}
+              element={<Navigate to="/?error=invalid-path" />}
             />
           </Route>
         </Routes>
