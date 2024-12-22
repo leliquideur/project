@@ -34,11 +34,12 @@ import { AuthProvider } from './contexts/AuthContext';
 import { Dashboard } from './pages/Dashboard';
 import { Signup } from './pages/loginAnSignup/Signup';
 import { Login } from './pages/loginAnSignup/Login';
-import { TicketList } from './pages/TicketList';
-import { TicketDetail } from './pages/TicketDetail';
-import { CreateTicket } from './pages/newTicketAndModify/CreateTicket';
+import { TicketList } from './pages/ticket/listTickets/TicketList';
+import { TicketDetail } from './pages/ticket/listTickets/TicketDetail';
+import { CreateTicket } from './pages/ticket/newTicketAndModify/CreateTicket';
 import { Profiles } from './pages/user/Profiles';
 import { ProfileDetails } from './pages/user/ProfileDetails';
+import { Settings } from "./pages/Settings";
 
 // Import temporaire, à supprimer en production
 import { ForcedTickets } from './forced/TicketForced';
@@ -55,14 +56,21 @@ function App() {
             <Route path="/login" element={<Login />} />
             <Route path="/profiles" element={<Profiles />} />
 
-            <Route element={<ProtectedRoute children={undefined} />}>
+            <Route element={<ProtectedRoute />}>
               <Route path="/profiles/:id" element={<ProfileDetails />} />
-              <Route path="/dashboard" element={<Dashboard tickets={forcedTickets} />} />
+              <Route
+                path="/dashboard"
+                element={<Dashboard tickets={forcedTickets} />}
+              />
               <Route path="/tickets" element={<TicketList />} />
               <Route path="/tickets/new" element={<CreateTicket />} />
               <Route path="/tickets/:id" element={<TicketDetail />} />
+              <Route path="/settings" element={<Settings />} />
             </Route>
-            <Route path="*" element={<Navigate to="/login?error=invalid-path" />} />
+            <Route
+              path="*"
+              element={<Navigate to="/login?error=invalid-path" />}
+            />
           </Route>
         </Routes>
       </AuthProvider>
