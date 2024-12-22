@@ -15,5 +15,40 @@
   },
   "layout": {
       "invalidPath": "Chemin erroné. Vous avez été redirigé vers la page d'accueil."
+  },
+  "Ticket": {
+    "title": "Tickets",
+    "newTicket": "Nouveau ticket",
+    "search": "Rechercher",
+    "searchPlaceholder": "Rechercher par numéro de ticket",
+    "ticketNumber": "Numéro de ticket",
+    "status": "Statut",
+    "priority": "Priorité",
+    "subject": "Sujet",
+    "assignee": "Assigné à",
+    "created": "Créé",
+    "updated": "Mis à jour",
+    "actions": "Actions",
+    "noTickets": "Aucun ticket trouvé",
+    "description": "Description",
+    "type": "Type",
+    "createdAt": "Créé à",
+    "priority_high": "Haute",
+    "priority_medium": "Moyenne",
+    "priority_low": "Basse",
+    "status_new": "Ouvert",
+    "status_in_progress": "En cours",
+    "status_closed": "Fermé",
+    "status_pending": "En attente",
+    "status_resolved": "Résolu",
+    "status_rejected": "Rejeté",
+    "date": "fr-FR",
+    "type_problem": "Problème",
+    "type_service_request": "Demande de service",
+    "type_task": "Question",
+    "previous": "Précédent",
+    "next": "Suivant"
+
+
   }
 }

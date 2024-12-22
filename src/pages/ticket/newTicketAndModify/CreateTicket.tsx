@@ -136,6 +136,9 @@ export function CreateTicket() {
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
   const [priority, setPriority] = useState<'low' | 'medium' | 'high'>('low');
+  const [type, setType] = useState<"problem" | "task" | "service_request">(
+    "problem"
+  );
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -151,18 +154,17 @@ export function CreateTicket() {
     }
 
     try {
-      const { data, error } = await supabase
-        .from('tickets')
-        .insert([
-          {
-            title,
-            description,
-            priority,
-            user_id: user.id,
-            status: 'open',
-            created_at: new Date(),
-          },
-        ]);
+      const { data, error } = await supabase.from("tickets").insert([
+        {
+          title,
+          description,
+          priority,
+          created_by: user.id,
+          status: "new",
+          type,
+          created_at: new Date(),
+        },
+      ]);
 
       if (error) {
         throw error;
@@ -185,11 +187,22 @@ export function CreateTicket() {
       >
         <h2 className="text-2xl font-bold mb-4">Créer un Ticket</h2>
 
-        {error && (
-          <div className="mb-4 text-red-500">
-            {error}
-          </div>
-        )}
+        {error && <div className="mb-4 text-red-500">{error}</div>}
+
+        <div className="mb-4">
+          <label className="block text-gray-700">Type</label>
+          <select
+            value={type}
+            onChange={(e) =>
+              setType(e.target.value as "problem" | "task" | "service_request")
+            }
+            className="w-full mt-1 p-2 border rounded"
+          >
+            <option value="problem">problem</option>
+            <option value="task">task</option>
+            <option value="service_request">service_request</option>
+          </select>
+        </div>
 
         <div className="mb-4">
           <label className="block text-gray-700">Titre</label>
@@ -218,7 +231,9 @@ export function CreateTicket() {
           <label className="block text-gray-700">Priorité</label>
           <select
             value={priority}
-            onChange={(e) => setPriority(e.target.value as 'low' | 'medium' | 'high')}
+            onChange={(e) =>
+              setPriority(e.target.value as "low" | "medium" | "high")
+            }
             className="w-full mt-1 p-2 border rounded"
           >
             <option value="low">Faible</option>
@@ -231,10 +246,10 @@ export function CreateTicket() {
           type="submit"
           disabled={loading}
           className={`w-full p-2 rounded ${
-            loading ? 'bg-gray-400' : 'bg-blue-500 hover:bg-blue-600'
+            loading ? "bg-gray-400" : "bg-blue-500 hover:bg-blue-600"
           } text-white font-semibold`}
         >
-          {loading ? 'Création...' : 'Créer le Ticket'}
+          {loading ? "Création..." : "Créer le Ticket"}
         </button>
       </form>
     </div>
