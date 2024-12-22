@@ -2,9 +2,10 @@ import { NavLink } from 'react-router-dom';
 import { LayoutDashboard, Ticket, PlusCircle, Settings, Users, Bell, LogOut } from 'lucide-react';
 import { useAuthStore } from '../../api/store/authStore';
 import { useTranslation } from 'react-i18next';
+import { useAuth } from '../../hooks/useAuth';
 
 export function Sidebar() {
-  const user = useAuthStore((state) => state.user);
+  const { user } = useAuth(); // Déstructuration pour obtenir user du contexte
   const { signOut } = useAuthStore();
   const { i18n, t } = useTranslation();
 
@@ -20,7 +21,7 @@ export function Sidebar() {
           src="https://www.heurtiersas.com/images/logo.png"
           alt="Heurtier fiX"
         />
-        <h3 className="text-2sl font-bold">Heurtier fiX</h3>
+        <h3 className="text-2xl font-bold">Heurtier fiX</h3>
         <p className="text-sm">Quand chaque minute compte.</p>
       </div>
       <span className="block h-px bg-gray-700 my-4" />
@@ -33,10 +34,10 @@ export function Sidebar() {
         <span className="px-2 py-1 rounded-full text-xs capitalize bg-blue-100 text-blue-800 inline-block mt-2">
           {user ? (
             <span>
-              {t("header.role")}: {user?.role}
+              {t("header.role")}: {user.role}
             </span>
           ) : (
-            <span>{t("header.disconected")}</span>
+            <span>{t("header.disconnected")}</span>
           )}
         </span>
 
