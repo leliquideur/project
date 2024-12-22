@@ -1,6 +1,6 @@
 import React from "react";
 import { Link } from "react-router-dom";
-import { BarChart3, Clock, AlertCircle, CheckCircle2 } from "lucide-react";
+import { BarChart3, Clock, AlertCircle, CheckCircle2, XCircle } from "lucide-react";
 import { Ticket } from "../types";
 import StatCard from "../components/StatCard";
 
@@ -19,7 +19,15 @@ export const Dashboard: React.FC<DashboardProps> = ({ tickets }) => {
     highPriority: tickets.filter((t) => t.priority === "high").length,
   };
 
-  const filteredTickets = filter ? tickets.filter((t) => t.status === filter) : tickets.slice(0, 10);
+  const filteredTickets = filter
+    ? filter === "high"
+      ? tickets.filter((t) => t.priority === "high")
+      : tickets.filter((t) => t.status === filter)
+    : tickets.slice(0, 10);
+
+  const handleFilterClick = (filterType: string) => {
+    setFilter((prevFilter) => (prevFilter === filterType ? null : filterType));
+  };
 
   if (isLoading) {
     return <div className="text-center py-12">Loading...</div>;
@@ -29,48 +37,50 @@ export const Dashboard: React.FC<DashboardProps> = ({ tickets }) => {
     <div className="space-y-6">
       <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
         <StatCard
+          title="High Priority"
+          value={stats.highPriority}
+          icon={AlertCircle}
+          color="text-red-600"
+          bgColor={filter === "high" ? "bg-red-200" : "bg-red-50"}
+          onClick={() => handleFilterClick("high")}
+        />
+        <StatCard
           title="New Tickets"
           value={stats.new}
           icon={Clock}
           color="text-yellow-600"
-          bgColor={filter === "new" ? "bg-yellow-100" : "bg-yellow-50"}
-          onClick={() => setFilter("new")}
+          bgColor={filter === "new" ? "bg-yellow-200" : "bg-yellow-50"}
+          onClick={() => handleFilterClick("new")}
         />
         <StatCard
           title="In Progress"
           value={stats.inProgress}
           icon={BarChart3}
           color="text-blue-600"
-          bgColor={filter === "in_progress" ? "bg-blue-100" : "bg-blue-50"}
-          onClick={() => setFilter("in_progress")}
+          bgColor={filter === "in_progress" ? "bg-blue-200" : "bg-blue-50"}
+          onClick={() => handleFilterClick("in_progress")}
         />
         <StatCard
           title="Resolved"
           value={stats.resolved}
           icon={CheckCircle2}
           color="text-green-600"
-          bgColor={filter === "resolved" ? "bg-green-100" : "bg-green-50"}
-          onClick={() => setFilter("resolved")}
+          bgColor={filter === "resolved" ? "bg-green-200" : "bg-green-50"}
+          onClick={() => handleFilterClick("resolved")}
         />
         <StatCard
-          title="High Priority"
-          value={stats.highPriority}
-          icon={AlertCircle}
+          title="Sans filtre"
+          value={null}
+          icon={XCircle}
           color="text-red-600"
-          bgColor={filter === "high" ? "bg-red-100" : "bg-red-50"}
-          onClick={() => setFilter("high")}
+          bgColor={filter === null ? "bg-purple-200" : "bg-purple-50"}
+          onClick={() => setFilter(null)}
         />
       </div>
 
       <div className="bg-white shadow rounded-lg p-6">
         <div className="flex justify-between items-center mb-4">
-          <h2 className="text-lg font-medium text-gray-900">Recent Tickets</h2>
-          <button
-            onClick={() => setFilter(null)}
-            className="text-sm font-medium text-primary-600 hover:text-primary-700"
-          >
-            Voir les 10 derniers tickets
-          </button>
+          <h2 className="text-lg font-medium text-gray-900">Tickets</h2>
         </div>
         <div className="space-y-4">
           {filteredTickets.map((ticket) => (

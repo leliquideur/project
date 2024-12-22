@@ -12,5 +12,8 @@
     "notifications": "Notifications",
     "role": "Rôle",
     "disconected": "deconnecté"
+  },
+  "layout": {
+      "invalidPath": "Chemin erroné. Vous avez été redirigé vers la page d'accueil."
   }
 }

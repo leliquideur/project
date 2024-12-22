@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 import supabase from '../lib/supabaseClient';
-import type { Profile } from '../types';
+import type { Profile, UserRole } from '../types';
 
 interface AuthState {
   user: Profile | null;
@@ -12,21 +12,43 @@ interface AuthState {
 
 export const useAuthStore = create<AuthState>((set) => ({
   user: null,
-  loading: true,
-  setUser: (user) => set({ user }),
+  loading: false,
+  setUser: (user) => {
+    console.log('Utilisateur mis à jour:', user); // Ajoutez ce log
+    set({ user });
+  },
   signIn: async (email, password) => {
-    const { error } = await supabase.auth.signInWithPassword({
+    set({ loading: true });
+    const { data, error } = await supabase.auth.signInWithPassword({
       email,
       password,
     });
-    if (error) throw error;
+    if (error) {
+      set({ loading: false });
+      throw error;
+    }
+    if (data.user) {
+      const { id, email, role } = data.user;
+      if (!role) throw new Error('User role is undefined');
+      const userProfile: Profile = {
+        id,
+        email: email as string,
+        role: role as UserRole,
+        full_name: null,
+        created_at: '',
+        updated_at: ''
+      };
+      console.log('Profil utilisateur:', userProfile); // Ajoutez ce log
+      set({ user: userProfile, loading: false });
+    }
   },
   signOut: async () => {
+    set({ loading: true });
     const { error } = await supabase.auth.signOut();
-    if (error) throw error;
-    set({ user: null });
+    if (error) {
+      set({ loading: false });
+      throw error;
+    }
+    set({ user: null, loading: false });
   },
 }));
-
-
-// Utilisation de supabase dans authStore
