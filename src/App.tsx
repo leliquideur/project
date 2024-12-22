@@ -41,11 +41,9 @@ import { Profiles } from './pages/user/Profiles';
 import { ProfileDetails } from './pages/user/ProfileDetails';
 import { Settings } from "./pages/Settings";
 
-// Import temporaire, à supprimer en production
-import { ForcedTickets } from './forced/TicketForced';
 
 function App() {
-  const forcedTickets = ForcedTickets(); // À supprimer après les tests
+
 
   return (
     <Router future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
@@ -58,10 +56,7 @@ function App() {
 
             <Route element={<ProtectedRoute />}>
               <Route path="/profiles/:id" element={<ProfileDetails />} />
-              <Route
-                path="/dashboard"
-                element={<Dashboard tickets={forcedTickets} />}
-              />
+              <Route path="/dashboard" element={<Dashboard />}/>
               <Route path="/tickets" element={<TicketList />} />
               <Route path="/tickets/new" element={<CreateTicket />} />
               <Route path="/tickets/:id" element={<TicketDetail />} />

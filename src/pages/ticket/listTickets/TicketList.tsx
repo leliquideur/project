@@ -1,18 +1,8 @@
 import React, { useEffect, useState } from "react";
-import supabase from "../../../lib/supabaseClient";
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from "react-router-dom";
-
-
-interface Ticket {
-  id: string;
-  title: string;
-  description: string;
-  priority: "low" | "medium" | "high";
-  status: "problem" | "task" | "service_request";
-  type: string;
-  created_at: string;
-}
+import { fetchTickets } from '../../../lib/ticketService';
+import { Ticket } from "../../../types";
 
 export function TicketList() {
   const { t } = useTranslation();
@@ -29,27 +19,14 @@ export function TicketList() {
   const PAGE_SIZE = 10;
 
   useEffect(() => {
-    const fetchTickets = async () => {
+    const getTickets = async () => {
       setLoading(true);
       setError(null);
       try {
-        const from = (currentPage - 1) * PAGE_SIZE;
-        const to = from + PAGE_SIZE - 1;
-
-        const { data, error, count } = await supabase
-          .from("tickets")
-          .select("*", { count: 'exact' })
-          .order(sortField, { ascending: sortOrder === 'asc' })
-          .range(from, to);
-
-        if (error) {
-          setError(t("Ticket.errorFetchingTickets"));
-          console.error(error);
-        } else {
-          setTickets(data as Ticket[]);
-          setTotalPages(Math.ceil((count || 0) / PAGE_SIZE));
-        }
-      } catch (err) {
+        const { data, count } = await fetchTickets(sortField, sortOrder, currentPage, PAGE_SIZE);
+        setTickets(data);
+        setTotalPages(Math.ceil(count / PAGE_SIZE));
+      } catch (err: any) {
         setError(t("Ticket.errorFetchingTickets"));
         console.error(err);
       } finally {
@@ -57,7 +34,7 @@ export function TicketList() {
       }
     };
 
-    fetchTickets();
+    getTickets();
   }, [sortField, sortOrder, currentPage, t]);
 
   const handleSort = (field: string) => {
@@ -95,7 +72,7 @@ export function TicketList() {
         <h1 className="text-2xl font-bold mb-4 text-center p-3">
           {t("Ticket.title")}
         </h1>
-        <table className="w-4/5 mx-auto bg-white mx-auto p-3">
+        <table className="w-4/5 mx-auto bg-white p-3">
           <thead>
             <tr>
               <th
@@ -170,7 +147,7 @@ export function TicketList() {
                     ? `${ticket.title.substring(0, 30)}...`
                     : ticket.title}
                 </td>
-                <td className="border px-4 py-2 truncate w-10 truncate overflow-ellipsis overflow-hidden">
+                <td className="border px-4 py-2 truncate w-10 overflow-ellipsis overflow-hidden">
                   {ticket.description.length > 30
                     ? `${ticket.description.substring(0, 30)}...`
                     : ticket.description}
