@@ -1,6 +1,6 @@
 import { create } from 'zustand';
-import supabase from '../lib/supabaseClient';
-import type { Ticket } from '../types';
+import supabase from '../../lib/supabaseClient';
+import type { Ticket } from '../../types';
 
 interface TicketState {
   tickets: Ticket[];

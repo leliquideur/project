@@ -1,4 +1,3 @@
-import React from 'react';
 import type { TicketStatus } from '../../types';
 
 const statusColors: Record<TicketStatus, { bg: string; text: string }> = {

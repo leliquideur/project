@@ -1,4 +1,3 @@
-import React from 'react';
 import type { TicketPriority } from '../../types';
 
 const priorityColors: Record<TicketPriority, { bg: string; text: string }> = {

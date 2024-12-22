@@ -38,6 +38,7 @@ import { TicketList } from './pages/TicketList';
 import { TicketDetail } from './pages/TicketDetail';
 import { CreateTicket } from './pages/newTicketAndModify/CreateTicket';
 import { Profiles } from './pages/user/Profiles';
+import { ProfileDetails } from './pages/user/ProfileDetails';
 
 //A supprimer après les tests
 import { ForcedTickets } from './forced/TicketForced';
@@ -56,14 +57,15 @@ function App() {
             <Route path="/signup" element={<Signup />} />
             <Route path="/login" element={<Login />} />
             <Route path="/profiles" element={<Profiles />} />
-            <Route
-              path="/dashboard"
-              element={<Dashboard tickets={forcedTickets} />}
-            />
+            <Route path="/profiles/:id" element={<ProfileDetails />} />
+
             <Route
               element={
                 <ProtectedRoute>
-                  <Dashboard tickets={[]} />
+                  <Route
+                    path="/dashboard"
+                    element={<Dashboard tickets={forcedTickets} />}
+                  />
                 </ProtectedRoute>
               }
             >
@@ -71,7 +73,10 @@ function App() {
               <Route path="/tickets/new" element={<CreateTicket />} />
               <Route path="/tickets/:id" element={<TicketDetail />} />
             </Route>
-            <Route path="*" element={<Navigate to="/Login?error=invalid-path" />} />
+            <Route
+              path="*"
+              element={<Navigate to="/Login?error=invalid-path" />}
+            />
           </Route>
         </Routes>
       </AuthProvider>

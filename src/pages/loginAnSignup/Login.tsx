@@ -19,7 +19,7 @@ export function Login() {
       setError(error.message);
     } else {
       // Rediriger l'utilisateur après une connexion réussie
-      window.location.href = "/Dashboard";
+      window.location.href = "/";
     }
   };
 

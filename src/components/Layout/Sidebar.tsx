@@ -1,6 +1,6 @@
 import { NavLink } from 'react-router-dom';
 import { LayoutDashboard, Ticket, PlusCircle, Settings, Users, Bell, LogOut } from 'lucide-react';
-import { useAuthStore } from '../../store/authStore';
+import { useAuthStore } from '../../api/store/authStore';
 import { useTranslation } from 'react-i18next';
 
 export function Sidebar() {
