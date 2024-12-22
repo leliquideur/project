@@ -9,15 +9,17 @@ export function Sidebar() {
   return (
     <aside className="bg-gray-900 text-white w-64 min-h-screen p-4">
       <div className="mb-8">
-        <h1 className="text-2xl font-bold">Support System</h1>
+        <img src="https://heurtier.io/static/media/logo.3b3b3b3b.svg" alt="Heurtier fiX" />
+        <h1 className="text-2xl font-bold">Heurtier fiX</h1>
+        <p className="text-sm">Quand chaque minute compte.</p>
       </div>
-      
+
       <nav className="space-y-2">
         <NavLink
-          to="/"
+          to="/Dashboard"
           className={({ isActive }) =>
             `flex items-center space-x-2 p-2 rounded-lg hover:bg-gray-800 ${
-              isActive ? 'bg-gray-800' : ''
+              isActive ? "bg-gray-800" : ""
             }`
           }
         >
@@ -29,7 +31,7 @@ export function Sidebar() {
           to="/tickets"
           className={({ isActive }) =>
             `flex items-center space-x-2 p-2 rounded-lg hover:bg-gray-800 ${
-              isActive ? 'bg-gray-800' : ''
+              isActive ? "bg-gray-800" : ""
             }`
           }
         >
@@ -41,7 +43,7 @@ export function Sidebar() {
           to="/tickets/new"
           className={({ isActive }) =>
             `flex items-center space-x-2 p-2 rounded-lg hover:bg-gray-800 ${
-              isActive ? 'bg-gray-800' : ''
+              isActive ? "bg-gray-800" : ""
             }`
           }
         >
@@ -53,7 +55,7 @@ export function Sidebar() {
           to="/profiles"
           className={({ isActive }) =>
             `flex items-center space-x-2 p-2 rounded-lg hover:bg-gray-800 ${
-              isActive ? 'bg-gray-800' : ''
+              isActive ? "bg-gray-800" : ""
             }`
           }
         >
@@ -66,7 +68,7 @@ export function Sidebar() {
             to="/settings"
             className={({ isActive }) =>
               `flex items-center space-x-2 p-2 rounded-lg hover:bg-gray-800 ${
-                isActive ? 'bg-gray-800' : ''
+                isActive ? "bg-gray-800" : ""
               }`
             }
           >

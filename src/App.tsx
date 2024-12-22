@@ -27,20 +27,27 @@
  * @see {@link ./components/pages/TicketDetail} for the ticket detail page component.
  * @see {@link ./components/components/ProtectedRoute} for the protected route component.
  */
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { ProtectedRoute } from './components/ProtectedRoute';
 import { Layout } from './components/Layout/Layout';
-import { AuthProvider } from './components/AuthProvider';
-import { Dashboard } from './components/pages/Dashboard';
-import { Signup } from './components/pages/Signup';
-import { Login } from './components/pages/Login';
-import { TicketList } from './components/pages/TicketList';
-import { TicketDetail } from './components/pages/TicketDetail';
-import { CreateTicket } from './components/pages/CreateTicket';
-import { Profiles } from './components/pages/Profiles';
+import { AuthProvider } from './contexts/AuthProvider';
+import { Dashboard } from './pages/Dashboard';
+import { Signup } from './pages/loginAnSignup/Signup';
+import { Login } from './pages/loginAnSignup/Login';
+import { TicketList } from './pages/TicketList';
+import { TicketDetail } from './pages/TicketDetail';
+import { CreateTicket } from './pages/newTicketAndModify/CreateTicket';
+import { Profiles } from './pages/user/Profiles';
+
+//A supprimer après les tests
+import { ForcedTickets } from './forced/TicketForced';
+
 // import { NotFound } from './components/pages/NotFound';
 
 function App() {
+  //A supprimer après les tests
+  const forcedTickets = ForcedTickets();
+
   return (
     <Router future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
       <AuthProvider>
@@ -50,18 +57,21 @@ function App() {
             <Route path="/login" element={<Login />} />
             <Route path="/profiles" element={<Profiles />} />
             <Route
+              path="/dashboard"
+              element={<Dashboard tickets={forcedTickets} />}
+            />
+            <Route
               element={
                 <ProtectedRoute>
-                  <Dashboard />
-                  <TicketList />
+                  <Dashboard tickets={[]} />
                 </ProtectedRoute>
               }
             >
-              <Route path="/dashboard" element={<Dashboard />} />
               <Route path="/tickets" element={<TicketList />} />
               <Route path="/tickets/new" element={<CreateTicket />} />
               <Route path="/tickets/:id" element={<TicketDetail />} />
             </Route>
+            <Route path="*" element={<Navigate to="/Login?error=invalid-path" />} />
           </Route>
         </Routes>
       </AuthProvider>
