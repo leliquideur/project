@@ -1,33 +1,25 @@
 import React from "react";
 import { Link } from "react-router-dom";
 import { BarChart3, Clock, AlertCircle, CheckCircle2 } from "lucide-react";
-import { getTickets } from "../../lib/tickets";
-import { Ticket } from "../../types";
+import { Ticket } from "../types";
+import StatCard from "../components/StatCard";
 
-export  function Dashboard() {
-  const [tickets, setTickets] = React.useState<Ticket[]>([]);
-  const [isLoading, setIsLoading] = React.useState(true);
+interface DashboardProps {
+  tickets: Ticket[];
+}
 
-  React.useEffect(() => {
-    async function loadTickets() {
-      try {
-        const data = await getTickets();
-        setTickets(data);
-      } catch (error) {
-        console.error("Error loading tickets:", error);
-      } finally {
-        setIsLoading(false);
-      }
-    }
-    loadTickets();
-  }, []);
+export const Dashboard: React.FC<DashboardProps> = ({ tickets }) => {
+  const [isLoading, setIsLoading] = React.useState(false);
+  const [filter, setFilter] = React.useState<string | null>(null);
 
   const stats = {
-    pending: tickets.filter((t) => t.status === "in_progress").length,
+    new: tickets.filter((t) => t.status === "new").length, 
     inProgress: tickets.filter((t) => t.status === "in_progress").length,
     resolved: tickets.filter((t) => t.status === "resolved").length,
     highPriority: tickets.filter((t) => t.priority === "high").length,
   };
+
+  const filteredTickets = filter ? tickets.filter((t) => t.status === filter) : tickets.slice(0, 10);
 
   if (isLoading) {
     return <div className="text-center py-12">Loading...</div>;
@@ -37,47 +29,51 @@ export  function Dashboard() {
     <div className="space-y-6">
       <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
         <StatCard
-          title="Pending Tickets"
-          value={stats.pending}
+          title="New Tickets"
+          value={stats.new}
           icon={Clock}
           color="text-yellow-600"
-          bgColor="bg-yellow-50"
+          bgColor={filter === "new" ? "bg-yellow-100" : "bg-yellow-50"}
+          onClick={() => setFilter("new")}
         />
         <StatCard
           title="In Progress"
           value={stats.inProgress}
           icon={BarChart3}
           color="text-blue-600"
-          bgColor="bg-blue-50"
+          bgColor={filter === "in_progress" ? "bg-blue-100" : "bg-blue-50"}
+          onClick={() => setFilter("in_progress")}
         />
         <StatCard
           title="Resolved"
           value={stats.resolved}
           icon={CheckCircle2}
           color="text-green-600"
-          bgColor="bg-green-50"
+          bgColor={filter === "resolved" ? "bg-green-100" : "bg-green-50"}
+          onClick={() => setFilter("resolved")}
         />
         <StatCard
           title="High Priority"
           value={stats.highPriority}
           icon={AlertCircle}
           color="text-red-600"
-          bgColor="bg-red-50"
+          bgColor={filter === "high" ? "bg-red-100" : "bg-red-50"}
+          onClick={() => setFilter("high")}
         />
       </div>
 
       <div className="bg-white shadow rounded-lg p-6">
         <div className="flex justify-between items-center mb-4">
           <h2 className="text-lg font-medium text-gray-900">Recent Tickets</h2>
-          <Link
-            to="/tickets"
+          <button
+            onClick={() => setFilter(null)}
             className="text-sm font-medium text-primary-600 hover:text-primary-700"
           >
-            View all
-          </Link>
+            Voir les 10 derniers tickets
+          </button>
         </div>
         <div className="space-y-4">
-          {tickets.slice(0, 5).map((ticket) => (
+          {filteredTickets.map((ticket) => (
             <Link
               key={ticket.id}
               to={`/tickets/${ticket.id}`}
@@ -110,36 +106,4 @@ export  function Dashboard() {
   );
 }
 
-function StatCard({
-  title,
-  value,
-  icon: Icon,
-  color,
-  bgColor,
-}: {
-  title: string;
-  value: number;
-  icon: React.ElementType;
-  color: string;
-  bgColor: string;
-}) {
-  return (
-    <div className="bg-white overflow-hidden shadow rounded-lg">
-      <div className="p-5">
-        <div className="flex items-center">
-          <div className={`flex-shrink-0 ${bgColor} rounded-md p-3`}>
-            <Icon className={`h-6 w-6 ${color}`} />
-          </div>
-          <div className="ml-5 w-0 flex-1">
-            <dl>
-              <dt className="text-sm font-medium text-gray-500 truncate">
-                {title}
-              </dt>
-              <dd className="text-lg font-medium text-gray-900">{value}</dd>
-            </dl>
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-}
+export default StatCard;

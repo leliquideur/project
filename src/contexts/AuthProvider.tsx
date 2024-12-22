@@ -3,7 +3,7 @@ import supabase from "../lib/supabaseClient";
 import { User } from "@supabase/supabase-js";
 
 interface AuthContextType {
-  user: any; // Vous pouvez remplacer 'any' par le type approprié pour l'utilisateur
+  user: User | null;
 }
 
 const AuthContext = createContext<AuthContextType | null>(null);
@@ -14,7 +14,6 @@ interface AuthProviderProps {
 
 export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
-  
 
   useEffect(() => {
     async function fetchSession() {
@@ -42,7 +41,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   );
 };
 
-export function useAuthStore() {
+export function useAuth() {
   return useContext(AuthContext);
 }
 

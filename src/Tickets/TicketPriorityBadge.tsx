@@ -1,5 +1,5 @@
 import React from 'react';
-import type { TicketPriority } from '../../types';
+import type { TicketPriority } from '../types';
 
 const priorityColors: Record<TicketPriority, { bg: string; text: string }> = {
   low: { bg: 'bg-gray-100', text: 'text-gray-800' },
