@@ -1,36 +1,51 @@
-import React, { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
-import { getProfileById, updateProfile } from "../../api/profiles";
-import { useAuth } from "../../contexts/AuthContext";
+import React, { useEffect, useState } from 'react';
+import { useParams } from 'react-router-dom';
+import { useAuth } from '../../hooks/useAuth';
+import { getProfileById, updateProfile } from '../../api/profiles';
+
+interface Profile {
+  id: string;
+  email: string;
+  full_name?: string;
+  role?: string;
+}
 
 export function ProfileDetails() {
   const { id } = useParams<{ id: string }>();
-  const { user, loading: authLoading, error: authError } = useAuth();
-  const [profile, setProfile] = useState<any>(null);
+  const { user, loading: authLoading, error: authError, refreshUser } = useAuth();
+  const [profile, setProfile] = useState<Profile | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
-  const [formData, setFormData] = useState<any>({});
-  const [isEditing, setIsEditing] = useState<boolean>(false);
   const [canEdit, setCanEdit] = useState<boolean>(false);
+  const [formData, setFormData] = useState({
+    full_name: '',
+    role: '',
+  });
+  const [isEditing, setIsEditing] = useState<boolean>(false);
 
   useEffect(() => {
-    async function fetchProfile() {
-      try {
-        if (id) {
-          const data = await getProfileById(id);
-          console.log("Fetched profile:", data);
-          setProfile(data);
-          setFormData(data);
-        } else {
-          setError("ID de profil non fourni");
+    const fetchProfile = async () => {
+      if (id) {
+        try {
+          setLoading(true);
+          const fetchedProfile = await getProfileById(id);
+          if (fetchedProfile) {
+            setProfile(fetchedProfile);
+            setFormData({
+              full_name: fetchedProfile.full_name || '',
+              role: fetchedProfile.role || '',
+            });
+          } else {
+            setError('Profil non trouvé');
+          }
+        } catch (err: any) {
+          setError("Impossible de charger le profil");
+          console.error("Error fetching profile:", err);
+        } finally {
+          setLoading(false);
         }
-      } catch (err) {
-        setError("Impossible de charger le profil");
-        console.error("Error fetching profile:", err);
-      } finally {
-        setLoading(false);
       }
-    }
+    };
     fetchProfile();
   }, [id]);
 
@@ -63,6 +78,7 @@ export function ProfileDetails() {
           setProfile(updatedProfile); // Définir directement le profil mis à jour
           setIsEditing(false);
           alert("Profil mis à jour avec succès");
+          await refreshUser(); // Rafraîchir le contexte d'authentification
         } else {
           alert("Erreur lors de la mise à jour du profil");
         }
@@ -88,73 +104,51 @@ export function ProfileDetails() {
       {canEdit && (
         <button
           onClick={() => setIsEditing(!isEditing)}
-          className="mb-4 p-2 bg-blue-500 text-white rounded"
+          className="mb-4 px-4 py-2 bg-blue-500 text-white rounded"
         >
-          {isEditing ? "Annuler" : "Modifier le profil"}
+          {isEditing ? 'Annuler' : 'Modifier'}
         </button>
       )}
-      <form
-        onSubmit={handleSubmit}
-        className="grid grid-cols-1 md:grid-cols-2 gap-4"
-      >
-        <div className="p-4 border rounded-lg shadow-sm">
-          <h2 className="text-lg font-semibold">Informations de base</h2>
-          <label className="block mb-2">
-            <strong>Email :</strong>
-            <input
-              type="email"
-              name="email"
-              value={formData.email || ""}
-              onChange={handleChange}
-              className="w-full p-2 border rounded mt-1"
-              disabled={!isEditing}
-            />
-          </label>
-          <label className="block mb-2">
-            <strong>Nom complet :</strong>
+      {isEditing ? (
+        <form onSubmit={handleSubmit}>
+          <div className="mb-4">
+            <label className="block text-gray-700">Nom Complet</label>
             <input
               type="text"
               name="full_name"
-              value={formData.full_name || ""}
+              value={formData.full_name}
               onChange={handleChange}
-              className="w-full p-2 border rounded mt-1"
-              disabled={!isEditing}
+              className="w-full mt-1 p-2 border rounded"
+              required
             />
-          </label>
-          <label className="block mb-2">
-            <strong>Rôle :</strong>
-            <input
-              type="text"
-              name="role"
-              value={formData.role || ""}
-              onChange={handleChange}
-              className="w-full p-2 border rounded mt-1"
-              disabled={!isEditing}
-            />
-          </label>
-        </div>
-        <div className="p-4 border rounded-lg shadow-sm">
-          <h2 className="text-lg font-semibold">Dates importantes</h2>
-          <p>
-            <strong>Date de création :</strong>{" "}
-            {new Date(profile.created_at).toLocaleDateString()}
-          </p>
-          <p>
-            <strong>Dernière mise à jour :</strong>{" "}
-            {new Date(profile.updated_at).toLocaleDateString()}
-          </p>
-        </div>
-        {isEditing && (
-          <div className="col-span-1 md:col-span-2">
-            <button
-              type="submit"
-              className="w-full p-2 bg-green-500 text-white rounded"
-            >
-              Enregistrer les modifications
-            </button>
           </div>
-        )}
-      </form>
+          {user?.role === 'admin' && (
+            <div className="mb-4">
+              <label className="block text-gray-700">Rôle</label>
+              <input
+                type="text"
+                name="role"
+                value={formData.role}
+                onChange={handleChange}
+                className="w-full mt-1 p-2 border rounded"
+                required
+              />
+            </div>
+          )}
+          <button
+            type="submit"
+            className="px-4 py-2 bg-green-500 text-white rounded"
+          >
+            Enregistrer
+          </button>
+        </form>
+      ) : (
+        <div>
+          <p><strong>Nom Complet:</strong> {profile.full_name || 'Non renseigné'}</p>
+          <p><strong>Email:</strong> {profile.email}</p>
+          <p><strong>Rôle:</strong> {profile.role || 'Utilisateur'}</p>
+        </div>
+      )}
     </div>
   );
 }
