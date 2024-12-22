@@ -1,0 +1,16 @@
+{
+  "login": {
+    "title": "Login",
+    "email": "Email Address",
+    "password": "Password",
+    "submit": "Login",
+    "signup": "Don't have an account? Sign up"
+  },
+  "header": {
+    "welcome": "Welcome",
+    "signOut": "Sign Out",
+    "notifications": "Notifications",
+    "role": "Role",
+    "disconected": "Disconnected"
+  }
+}

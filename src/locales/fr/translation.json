@@ -1,0 +1,16 @@
+{
+  "login": {
+    "title": "Connexion",
+    "email": "Adresse e-mail",
+    "password": "Mot de passe",
+    "submit": "Se connecter",
+    "signup": "Pas encore de compte ? Créer un compte"
+  },
+  "header": {
+    "welcome": "Bienvenue",
+    "signOut": "Déconnexion",
+    "notifications": "Notifications",
+    "role": "Rôle",
+    "disconected": "deconnecté"
+  }
+}
