@@ -40,14 +40,13 @@ import { CreateTicket } from './pages/newTicketAndModify/CreateTicket';
 import { Profiles } from './pages/user/Profiles';
 import { ProfileDetails } from './pages/user/ProfileDetails';
 
-//A supprimer après les tests
-import { ForcedTickets } from './forced/TicketForced';
+
+import { ForcedTickets } from './forced/TicketForced'; //A supprimer après les tests
 
 // import { NotFound } from './components/pages/NotFound';
 
 function App() {
-  //A supprimer après les tests
-  const forcedTickets = ForcedTickets();
+  const forcedTickets = ForcedTickets(); //A supprimer après les tests
 
   return (
     <Router future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
@@ -57,22 +56,21 @@ function App() {
             <Route path="/signup" element={<Signup />} />
             <Route path="/login" element={<Login />} />
             <Route path="/profiles" element={<Profiles />} />
-            <Route path="/profiles/:id" element={<ProfileDetails />} />
 
-            <Route
+            <Route //protected routes
               element={
                 <ProtectedRoute>
+                  <Route path="/profiles/:id" element={<ProfileDetails />} />
                   <Route
                     path="/dashboard"
                     element={<Dashboard tickets={forcedTickets} />}
                   />
+                  <Route path="/tickets" element={<TicketList />} />
+                  <Route path="/tickets/new" element={<CreateTicket />} />
+                  <Route path="/tickets/:id" element={<TicketDetail />} />
                 </ProtectedRoute>
               }
-            >
-              <Route path="/tickets" element={<TicketList />} />
-              <Route path="/tickets/new" element={<CreateTicket />} />
-              <Route path="/tickets/:id" element={<TicketDetail />} />
-            </Route>
+            ></Route>
             <Route
               path="*"
               element={<Navigate to="/Login?error=invalid-path" />}
