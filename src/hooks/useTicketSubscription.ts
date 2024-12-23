@@ -1,6 +1,6 @@
 import { useEffect } from 'react';
 import supabase from '../lib/supabaseClient';
-import { useTicketStore } from '../api/store/ticketStore';
+import { useTicketStore } from '../store/ticketStore';
 
 export function useTicketSubscription() {
   const fetchTickets = useTicketStore((state) => state.fetchTickets);

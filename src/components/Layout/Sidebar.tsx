@@ -1,10 +1,15 @@
 import { NavLink } from 'react-router-dom';
 import { LayoutDashboard, Ticket, PlusCircle, Settings, Users, Bell, LogOut } from 'lucide-react';
-import { useAuthStore } from '../../api/store/authStore';
+import { useAuthStore } from '../../store/authStore';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '../../hooks/useAuth';
+import React from 'react';
 
-export function Sidebar() {
+interface SidebarProps {
+  className?: string;
+}
+
+export function Sidebar({ className }: SidebarProps) {
   const { user } = useAuth(); // Déstructuration pour obtenir user du contexte
   const { signOut } = useAuthStore();
   const { i18n, t } = useTranslation();
@@ -15,7 +20,7 @@ export function Sidebar() {
   };
 
   return (
-    <aside className="bg-gray-900 text-white w-64 min-h-screen p-4">
+    <aside className={`bg-gray-900 text-white w-64 min-h-screen p-4 ${className}`}>
       <div className="mb-8">
         <img
           src="https://www.heurtiersas.com/images/logo.png"
