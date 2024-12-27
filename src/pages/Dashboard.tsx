@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { BarChart3, Clock, AlertCircle, CheckCircle2, XCircle } from "lucide-react";
-import { fetchTickets } from '../lib/ticketService';
+import { loadTickets } from '../api/ticketsService';
 import { Ticket } from "../types";
 import StatCard from "../components/StatCard";
 
@@ -12,21 +12,7 @@ export const Dashboard: React.FC = () => {
   const [filter, setFilter] = useState<string | null>(null);
 
   useEffect(() => {
-    const getTickets = async () => {
-      setIsLoading(true);
-      setError(null);
-      try {
-        const { data, count } = await fetchTickets('created_at', 'desc', 1, 100); // Ajustez les paramètres si nécessaire
-        setTickets(data);
-      } catch (err: any) {
-        setError('Erreur lors de la récupération des tickets');
-        console.error(err);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    getTickets();
+    loadTickets(setTickets, setIsLoading, setError);
   }, []);
 
   const stats = {
@@ -42,9 +28,20 @@ export const Dashboard: React.FC = () => {
       : tickets.filter((t) => t.status === filter)
     : tickets.slice(0, 10);
 
-  const handleFilterClick = (filterType: string) => {
+  const handleFilterClick = (filterType: string | null) => {
     setFilter((prevFilter) => (prevFilter === filterType ? null : filterType));
   };
+
+  const renderStatCard = (title: string, value: number, icon: React.ElementType, color: string, bgColor: string, filterType: string | null) => (
+    <StatCard
+      title={title}
+      value={value}
+      icon={icon}
+      color={color}
+      bgColor={filter === filterType ? bgColor.replace('50', '200') : bgColor}
+      onClick={() => handleFilterClick(filterType)}
+    />
+  );
 
   if (isLoading) {
     return <div className="text-center py-12">Chargement...</div>;
@@ -57,46 +54,11 @@ export const Dashboard: React.FC = () => {
   return (
     <div className="space-y-6">
       <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
-        <StatCard
-          title="Haute Priorité"
-          value={stats.highPriority}
-          icon={AlertCircle}
-          color="text-red-600"
-          bgColor={filter === "high" ? "bg-red-200" : "bg-red-50"}
-          onClick={() => handleFilterClick("high")}
-        />
-        <StatCard
-          title="Nouveaux"
-          value={stats.new}
-          icon={Clock}
-          color="text-yellow-600"
-          bgColor={filter === "new" ? "bg-yellow-200" : "bg-yellow-50"}
-          onClick={() => handleFilterClick("new")}
-        />
-        <StatCard
-          title="En Progression"
-          value={stats.inProgress}
-          icon={BarChart3}
-          color="text-blue-600"
-          bgColor={filter === "in_progress" ? "bg-blue-200" : "bg-blue-50"}
-          onClick={() => handleFilterClick("in_progress")}
-        />
-        <StatCard
-          title="Résolus"
-          value={stats.resolved}
-          icon={CheckCircle2}
-          color="text-green-600"
-          bgColor={filter === "resolved" ? "bg-green-200" : "bg-green-50"}
-          onClick={() => handleFilterClick("resolved")}
-        />
-        <StatCard
-          title="Sans filtre"
-          value={null}
-          icon={XCircle}
-          color="text-red-600"
-          bgColor={filter === null ? "bg-purple-200" : "bg-purple-50"}
-          onClick={() => setFilter(null)}
-        />
+        {renderStatCard("Haute Priorité", stats.highPriority, AlertCircle, "text-red-600", "bg-red-50", "high")}
+        {renderStatCard("Nouveaux", stats.new, Clock, "text-yellow-600", "bg-yellow-50", "new")}
+        {renderStatCard("En Progression", stats.inProgress, BarChart3, "text-blue-600", "bg-blue-50", "in_progress")}
+        {renderStatCard("Résolus", stats.resolved, CheckCircle2, "text-green-600", "bg-green-50", "resolved")}
+        {renderStatCard("Sans filtre", 0, XCircle, "text-red-600", "bg-purple-50", null)}
       </div>
 
       <div className="bg-white shadow rounded-lg p-6">

@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { Ticket } from "../../../types";
-import { getTicketById } from "../../../api/ticketsService";
-import { useAuth } from "../../../hooks/useAuth";
+import { Ticket } from "../../types";
+import { getTicketById } from "../../api/ticketsService";
+import { useAuth } from "../../hooks/useAuth";
 
 export function TicketDetail() {
   const { id } = useParams<{ id: string }>();

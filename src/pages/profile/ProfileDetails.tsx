@@ -2,15 +2,8 @@ import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { useAuth } from '../../hooks/useAuth';
 import { getProfileById, updateProfile } from '../../api/profilesService';
+import { Profile } from "../../types/index";
 
-interface Profile {
-  id: string;
-  email: string;
-  full_name?: string | null;
-  role?: UserRole;
-}
-
-type UserRole = 'admin' | 'user' | 'guest'; // Define the possible roles
 
 export function ProfileDetails() {
   const { id } = useParams<{ id: string }>();
@@ -19,7 +12,7 @@ export function ProfileDetails() {
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
   const [canEdit, setCanEdit] = useState<boolean>(false);
-    role: undefined,
+  const [formData, setFormData] = useState({
     full_name: '',
     role: '',
   });
@@ -74,7 +67,7 @@ export function ProfileDetails() {
     console.log("Submitting form with data:", formData); // Log les données du formulaire
     try {
       if (id) {
-        const updatedProfile = await updateProfile(id, formData);
+        const updatedProfile = await updateProfile(id, formData as Partial<Profile>);
         console.log("Updated profile:", updatedProfile); // Log le profil mis à jour
         if (updatedProfile) {
           setProfile(updatedProfile); // Définir directement le profil mis à jour
