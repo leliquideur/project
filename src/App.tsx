@@ -37,8 +37,8 @@ import { Login } from './pages/loginAnSignup/Login';
 import { TicketList } from './pages/ticket/TicketList';
 import { TicketDetail } from './pages/ticket/TicketDetail';
 import { CreateTicket } from './pages/ticket/CreateTicket';
-import { Profiles } from './pages/user/Profiles';
-import { ProfileDetails } from './pages/user/ProfileDetails';
+import { Profiles } from './pages/profile/Profiles';
+import { ProfileDetails } from './pages/profile/ProfileDetails';
 import { Settings } from "./pages/Settings";
 
 
