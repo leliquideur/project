@@ -5,9 +5,9 @@ import React, {
   useState,
   ReactNode,
 } from "react";
-import supabase from "../../../lib/supabaseClient";
-import { getProfileById } from "../../../api/profilesService";
-import { useAuth } from '../../../hooks/useAuth';
+import supabase from "../../api/supabaseClient";
+import { getProfileById } from "../../api/profilesService";
+import { useAuth } from '../../hooks/useAuth';
 import { useNavigate } from 'react-router-dom';
 
 interface User {

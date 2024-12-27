@@ -1,4 +1,4 @@
-import supabase from '../lib/supabaseClient';
+import supabase from './supabaseClient';
 import { Ticket } from '../types';
 import { getCurrentProfile } from './profilesService';
 
@@ -21,18 +21,14 @@ export async function createTicket(ticket: Omit<Ticket, 'id' | 'created_at' | 'u
   return data;
 }
 
-export async function getTickets() {
+export async function getTickets(): Promise<Ticket[]> {
   const { data, error } = await supabase
     .from('tickets')
-    .select(`
-      *,
-      created_by:users!tickets_created_by_fkey(email),
-      assigned_to:users!tickets_assigned_to_fkey(email)
-    `)
+    .select('*')
     .order('created_at', { ascending: false });
 
   if (error) throw error;
-  return data;
+  return data as Ticket[];
 }
 
 export async function getTicketById(id: string) {
@@ -86,3 +82,51 @@ sortField: string = 'created_at', p0: string, p1: number, p2: number, sortOrder:
 
   return { data: data as Ticket[], count: count || 0 };
 };
+
+export async function loadTickets(setTickets: React.Dispatch<React.SetStateAction<Ticket[]>>, setIsLoading: React.Dispatch<React.SetStateAction<boolean>>, setError: React.Dispatch<React.SetStateAction<string | null>>) {
+  setIsLoading(true);
+  setError(null);
+  try {
+    const newTickets = await getTickets();
+    setTickets(newTickets);
+  } catch (err: any) {
+    setError('Erreur lors de la récupération des tickets');
+    console.error(err);
+  } finally {
+    setIsLoading(false);
+  }
+}
+
+export async function loadTicketsWithPagination(
+  sortField: string,
+  sortOrder: 'asc' | 'desc',
+  currentPage: number,
+  pageSize: number,
+  setTickets: React.Dispatch<React.SetStateAction<Ticket[]>>,
+  setTotalPages: React.Dispatch<React.SetStateAction<number>>,
+  setIsLoading: React.Dispatch<React.SetStateAction<boolean>>,
+  setError: React.Dispatch<React.SetStateAction<string | null>>
+) {
+  setIsLoading(true);
+  setError(null);
+  try {
+    const from = (currentPage - 1) * pageSize;
+    const to = from + pageSize - 1;
+
+    const { data, error, count } = await supabase
+      .from('tickets')
+      .select('*', { count: 'exact' })
+      .order(sortField, { ascending: sortOrder === 'asc' })
+      .range(from, to);
+
+    if (error) throw error;
+
+    setTickets(data as Ticket[]);
+    setTotalPages(Math.ceil((count ?? 0) / pageSize));
+  } catch (err: any) {
+    setError('Erreur lors de la récupération des tickets');
+    console.error(err);
+  } finally {
+    setIsLoading(false);
+  }
+}

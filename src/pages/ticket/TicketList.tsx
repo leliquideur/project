@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from "react";
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from "react-router-dom";
-import { fetchTickets } from '../../../lib/ticketService';
-import { Ticket } from "../../../types";
+import { loadTicketsWithPagination } from '../../api/ticketsService';
+import { Ticket } from "../../types";
 
 export function TicketList() {
   const { t } = useTranslation();
@@ -19,23 +19,17 @@ export function TicketList() {
   const PAGE_SIZE = 10;
 
   useEffect(() => {
-    const getTickets = async () => {
-      setLoading(true);
-      setError(null);
-      try {
-        const { data, count } = await fetchTickets(sortField, sortOrder, currentPage, PAGE_SIZE);
-        setTickets(data);
-        setTotalPages(Math.ceil(count / PAGE_SIZE));
-      } catch (err: any) {
-        setError(t("Ticket.errorFetchingTickets"));
-        console.error(err);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    getTickets();
-  }, [sortField, sortOrder, currentPage, t]);
+    loadTicketsWithPagination(
+      sortField,
+      sortOrder,
+      currentPage,
+      PAGE_SIZE,
+      setTickets,
+      setTotalPages,
+      setLoading,
+      setError
+    );
+  }, [sortField, sortOrder, currentPage]);
 
   const handleSort = (field: string) => {
     if (sortField === field) {
