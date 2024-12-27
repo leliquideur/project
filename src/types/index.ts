@@ -1,8 +1,14 @@
-export type UserRole = 'client' | 'technician' | 'admin';
+//export type UserRole = 'client' | 'technician' | 'admin';
 export type TicketStatus = 'new' | 'assigned' | 'in_progress' | 'on_hold' | 'resolved' | 'closed';
 export type TicketPriority = 'low' | 'medium' | 'high' | 'urgent';
 export type TicketType = 'problem' | 'task' | 'service_request';
 
+
+export enum UserRole {
+  Client = "client",
+  Technician = "technician",
+  Admin = "admin"
+}
 export interface Profile {
   id: string;
   email: string;
@@ -10,6 +16,10 @@ export interface Profile {
   role: UserRole;
   created_at: string;
   updated_at: string;
+}
+export interface FormDataProfile {
+  full_name: string;
+  role: UserRole;
 }
 
 export interface Ticket {
