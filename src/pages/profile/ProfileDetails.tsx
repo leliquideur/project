@@ -2,9 +2,15 @@ import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { useAuth } from '../../hooks/useAuth';
 import { getProfileById, updateProfile } from '../../api/profilesService';
-import { Profile, UserRole, FormDataProfile } from "../../types/index";
 
+interface Profile {
+  id: string;
+  email: string;
+  full_name?: string | null;
+  role?: UserRole;
+}
 
+type UserRole = 'admin' | 'user' | 'guest'; // Define the possible roles
 
 export function ProfileDetails() {
   const { id } = useParams<{ id: string }>();
@@ -13,11 +19,11 @@ export function ProfileDetails() {
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
   const [canEdit, setCanEdit] = useState<boolean>(false);
-  const [formData, setFormData] = useState<FormDataProfile>({
+    role: undefined,
     full_name: '',
-    role: UserRole.Client, // Valeur par défaut
+    role: '',
   });
-  const [, setIsEditing] = useState<boolean>(false);
+  const [isEditing, setIsEditing] = useState<boolean>(false);
 
   useEffect(() => {
     const fetchProfile = async () => {
@@ -29,12 +35,15 @@ export function ProfileDetails() {
             setProfile(fetchedProfile);
             setFormData({
               full_name: fetchedProfile.full_name || '',
-              role: fetchedProfile.role || UserRole.Client,
+              role: fetchedProfile.role || '',
             });
-            setLoading(false);
+          } else {
+            setError('Profil non trouvé');
           }
-        } catch (error) {
-          setError('Erreur lors de la récupération du profil');
+        } catch (err: any) {
+          setError("Impossible de charger le profil");
+          console.error("Error fetching profile:", err);
+        } finally {
           setLoading(false);
         }
       }
@@ -44,7 +53,7 @@ export function ProfileDetails() {
 
   useEffect(() => {
     if (user && profile) {
-      const isAdmin = user.role === UserRole.Admin;
+      const isAdmin = user.role === "admin";
       const isOwnProfile = user.id === profile.id;
       setCanEdit(isAdmin || isOwnProfile);
       console.log(
@@ -55,9 +64,9 @@ export function ProfileDetails() {
     }
   }, [user, profile]);
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
-    setFormData({ ...formData, [name]: value as UserRole });
+    setFormData({ ...formData, [name]: value });
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -65,7 +74,7 @@ export function ProfileDetails() {
     console.log("Submitting form with data:", formData); // Log les données du formulaire
     try {
       if (id) {
-        const updatedProfile = await updateProfile(id, formData as Partial<Profile>);
+        const updatedProfile = await updateProfile(id, formData);
         console.log("Updated profile:", updatedProfile); // Log le profil mis à jour
         if (updatedProfile) {
           setProfile(updatedProfile); // Définir directement le profil mis à jour
@@ -91,43 +100,57 @@ export function ProfileDetails() {
 
   return (
     <div className="p-6 bg-white rounded-lg shadow-md">
-      <h1 className="text-2xl font-bold mb-4">Détails du Profil</h1>
-      <form onSubmit={handleSubmit}>
-        <div className="mb-4">
-          <label htmlFor="full_name" className="block text-gray-700">Nom complet</label>
-          <input
-            type="text"
-            id="full_name"
-            name="full_name"
-            value={formData.full_name}
-            onChange={handleChange}
-            disabled={!canEdit}
-            className="mt-1 p-2 border w-full"
-          />
-        </div>
-        <div className="mb-4">
-          <label htmlFor="role" className="block text-gray-700">Rôle</label>
-          <select
-            id="role"
-            name="role"
-            value={formData.role}
-            onChange={handleChange}
-            disabled={!canEdit}
-            className="mt-1 p-2 border w-full"
-          >
-            <option value={UserRole.Client}>Client</option>
-            <option value={UserRole.Admin}>Administrateur</option>
-          </select>
-        </div>
-        {canEdit && (
+      <h1 className="text-2xl font-bold mb-4">
+        Profil de {profile.full_name || profile.email}
+      </h1>
+      {canEdit && (
+        <button
+          onClick={() => setIsEditing(!isEditing)}
+          className="mb-4 px-4 py-2 bg-blue-500 text-white rounded"
+        >
+          {isEditing ? 'Annuler' : 'Modifier'}
+        </button>
+      )}
+      {isEditing ? (
+        <form onSubmit={handleSubmit}>
+          <div className="mb-4">
+            <label className="block text-gray-700">Nom Complet</label>
+            <input
+              type="text"
+              name="full_name"
+              value={formData.full_name}
+              onChange={handleChange}
+              className="w-full mt-1 p-2 border rounded"
+              required
+            />
+          </div>
+          {user?.role === 'admin' && (
+            <div className="mb-4">
+              <label className="block text-gray-700">Rôle</label>
+              <input
+                type="text"
+                name="role"
+                value={formData.role}
+                onChange={handleChange}
+                className="w-full mt-1 p-2 border rounded"
+                required
+              />
+            </div>
+          )}
           <button
             type="submit"
-            className="bg-blue-500 text-white px-4 py-2 rounded"
+            className="px-4 py-2 bg-green-500 text-white rounded"
           >
-            Mettre à jour
+            Enregistrer
           </button>
-        )}
-      </form>
+        </form>
+      ) : (
+        <div>
+          <p><strong>Nom Complet:</strong> {profile.full_name || 'Non renseigné'}</p>
+          <p><strong>Email:</strong> {profile.email}</p>
+          <p><strong>Rôle:</strong> {profile.role || 'Utilisateur'}</p>
+        </div>
+      )}
     </div>
   );
 }

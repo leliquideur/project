@@ -6,7 +6,7 @@ import React, {
   ReactNode,
 } from "react";
 import supabase from "../../../lib/supabaseClient";
-import { getProfileById } from "../../../api/profiles";
+import { getProfileById } from "../../../api/profilesService";
 import { useAuth } from '../../../hooks/useAuth';
 import { useNavigate } from 'react-router-dom';
 
@@ -55,7 +55,6 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
             id: session.user.id,
             email: session.user.email!,
             role: userProfile.role,
-            full_name: userProfile.full_name,
           });
         } else {
           setUser({
