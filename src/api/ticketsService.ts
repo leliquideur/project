@@ -1,5 +1,5 @@
 import supabase from './supabaseClient';
-import { Ticket } from '../types';
+import { Ticket, Comment } from '../types';
 import { getCurrentProfile } from './profilesService';
 
 export async function createTicket(ticket: Omit<Ticket, 'id' | 'created_at' | 'updated_at' | 'created_by'>) {
@@ -40,6 +40,22 @@ export async function getTicketById(id: string) {
 
   if (error) throw error;
   return data;
+}
+
+/**
+ * Récupère les commentaires associés à un ticket donné.
+ * @param ticketId - L'ID du ticket.
+ * @returns Une promesse contenant un tableau de commentaires.
+ */
+export async function getCommentsByTicketId(ticketId: string): Promise<Comment[]> {
+  const { data, error } = await supabase
+    .from('ticket_comments')
+    .select('*')
+    .eq('ticket_id', ticketId)
+    .order('created_at', { ascending: true });
+
+  if (error) throw error;
+  return data as Comment[];
 }
 
 /**
@@ -129,4 +145,53 @@ export async function loadTicketsWithPagination(
   } finally {
     setIsLoading(false);
   }
+}
+
+/**
+ * Récupère les données du ticket et les commentaires associés.
+ * @param id - L'ID du ticket.
+ * @param userId - L'ID de l'utilisateur.
+ * @returns Une promesse contenant les données du ticket et les commentaires associés.
+ */
+export async function fetchTicketData(id: string, userId: string) {
+  const ticketData = await getTicketById(id);
+  if (ticketData.assigned_to !== userId && ticketData.created_by !== userId) {
+    throw new Error("Accès refusé.");
+  }
+  const commentsData = await getCommentsByTicketId(id);
+  return { ticketData, commentsData };
+}
+
+/**
+ * Récupère les informations de l'utilisateur par ID.
+ * @param userId - L'ID de l'utilisateur.
+ * @returns Une promesse contenant les informations de l'utilisateur.
+ */
+export async function getUserById(userId: string) {
+  const { data, error } = await supabase
+    .from('profiles')
+    .select('full_name, email')
+    .eq('id', userId)
+    .single();
+
+  if (error) throw error;
+  return data;
+}
+
+/**
+ * Envoie une réponse à un commentaire.
+ * @param ticketId - L'ID du ticket.
+ * @param content - Le texte de la réponse.
+ * @param userId - L'ID de l'utilisateur qui répond.
+ * @returns Une promesse résolue lorsque la réponse est ajoutée.
+ */
+export async function postCommentReply(ticketId: string, text: string, userId: string) {
+  const { data, error } = await supabase
+    .from('ticket_comments')
+    .insert([
+      { ticket_id: ticketId, content: text, user_id: userId }
+    ]);
+
+  if (error) throw error;
+  return data;
 }
