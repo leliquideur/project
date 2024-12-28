@@ -87,7 +87,7 @@ export async function getCommentsByTicketId(ticketId: string): Promise<Comment[]
  * @returns Une promesse contenant les données des tickets et le nombre total.
  */
 export const fetchTickets = async (
-sortField: string = 'created_at', p0: string, p1: number, p2: number, sortOrder: 'asc' | 'desc' = 'desc', currentPage: number = 1, pageSize: number = 10): Promise<{ data: Ticket[]; count: number }> => {
+sortField: string = 'created_at', _p0: string, _p1: number, _p2: number, sortOrder: 'asc' | 'desc' = 'desc', currentPage: number = 1, pageSize: number = 10): Promise<{ data: Ticket[]; count: number }> => {
   // Récupérer le profil courant de l'utilisateur
   const profile = await getCurrentProfile();
   if (!profile) throw new Error('Utilisateur non authentifié');

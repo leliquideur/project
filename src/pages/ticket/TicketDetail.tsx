@@ -1,12 +1,11 @@
-import React, { useEffect, useState } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useEffect, useState } from 'react';
+import { useParams } from 'react-router-dom';
 import { useAuth } from '../../hooks/useAuth';
 import { fetchTicketData, getUserById, postCommentReply } from '../../api/ticketsService';
 import { Ticket, Comment } from '../../types';
 
 const TicketDetail = () => {
   const { id } = useParams<{ id: string }>();
-  const navigate = useNavigate();
   const [ticket, setTicket] = useState<Ticket | null>(null);
   const [comments, setComments] = useState<Comment[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
