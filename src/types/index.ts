@@ -51,3 +51,12 @@ export interface TicketStatusHistory {
   new_status: TicketStatus;
   created_at: string;
 }
+
+// Ajout de l'interface Comment
+export interface Comment {
+  id: string;
+  ticket_id: string;
+  author: string;
+  content: string;
+  created_at: string;
+}
