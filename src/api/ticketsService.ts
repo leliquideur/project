@@ -1,4 +1,4 @@
-import supabase from './supabaseClient';
+import supabase  from './supabaseClient';
 import { Ticket, Comment } from '../types';
 import { getCurrentProfile } from './profilesService';
 
@@ -51,7 +51,20 @@ export async function getTickets(): Promise<Ticket[]> {
   return data.filter(ticket => ticket.created_by === user.id) as Ticket[];
 }
 
-export async function getTicketById(id: string) {
+export async function getTicketById(id: string): Promise<Ticket> {
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) throw new Error('User not authenticated');
+
+  const { data: userData, error: userError } = await supabase
+    .from('profiles')
+    .select('role')
+    .eq('id', user.id)
+    .single();
+
+  if (userError) throw userError;
+
+  const isAdmin = userData.role === 'admin';
+
   const { data, error } = await supabase
     .from('tickets')
     .select('*')
@@ -59,7 +72,18 @@ export async function getTicketById(id: string) {
     .single();
 
   if (error) throw error;
-  return data;
+
+  // Si l'utilisateur est un administrateur, retourner le ticket
+  if (isAdmin) {
+    return data as Ticket;
+  }
+
+  // Sinon, vérifier si l'utilisateur est le créateur du ticket
+  if (data.created_by !== user.id) {
+    throw new Error('Access denied');
+  }
+
+  return data as Ticket;
 }
 
 /**
@@ -72,10 +96,30 @@ export async function getCommentsByTicketId(ticketId: string): Promise<Comment[]
     .from('ticket_comments')
     .select('*')
     .eq('ticket_id', ticketId)
-    .order('created_at', { ascending: true });
+    .order('created_at', { ascending: false });
 
   if (error) throw error;
-  return data as Comment[];
+
+  const comments = data as Comment[];
+
+  // Récupérer les profils des utilisateurs
+  const userIds = comments.map(comment => comment.user_id);
+  const { data: profiles, error: profilesError } = await supabase
+    .from('profiles')
+    .select('id, full_name')
+    .in('id', userIds);
+
+  if (profilesError) throw profilesError;
+
+  const profilesMap = profiles.reduce((acc, profile) => {
+    acc[profile.id] = profile.full_name;
+    return acc;
+  }, {} as Record<string, string>);
+
+  return comments.map(comment => ({
+    ...comment,
+    user_full_name: profilesMap[comment.user_id]
+  }));
 }
 
 /**

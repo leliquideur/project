@@ -1,6 +1,5 @@
-import supabase  from './supabaseClient';
+import supabase from './supabaseClient';
 import { Profile } from '../types';
-//import { } 
 
 const PROFILES_TABLE = 'profiles';
 
@@ -81,6 +80,22 @@ export async function deleteProfile(id: string): Promise<{ id: string }> {
   }
 
   return data as { id: string };
+}
+
+/**
+ * Récupère le full_name d'un profil par son ID.
+ * @param id - L'ID du profil à récupérer.
+ * @returns Une promesse contenant le full_name ou null si non trouvé.
+ */
+export async function getFullNameById(id: string): Promise<string | null> {
+  const { data, error } = await supabase.from(PROFILES_TABLE).select('full_name').eq('id', id).single();
+
+  if (error) {
+    console.error(`Erreur lors de la récupération du full_name avec l'ID ${id} :`, error);
+    throw error;
+  }
+
+  return data?.full_name || null;
 }
 
 /**
