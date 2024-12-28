@@ -85,14 +85,23 @@ const TicketDetail = () => {
         <h1 className="text-lg font-medium text-gray-900">Détails du Ticket</h1>
         {ticket && (
           <div className="mt-4">
-            <h2 className="text-xl font-semibold text-gray-800">{ticket.title}</h2>
+            <h2 className="text-xl font-semibold text-gray-800">
+              {ticket.title}
+            </h2>
             <p className="mt-2 text-gray-600">{ticket.description}</p>
-            <p className="mt-2 text-gray-500">Créé par: {createdByUser?.full_name} ({createdByUser?.email})</p>
+            <p className="mt-2 text-gray-500">
+              Créé par: {createdByUser?.full_name} ({createdByUser?.email})
+            </p>
+            <p className="mt-2 text-gray-500">
+              Date de création: {new Date(ticket.created_at).toLocaleString()}
+            </p>
           </div>
         )}
       </div>
       <div className="bg-white shadow rounded-lg p-6">
-        <h3 className="text-lg font-medium text-gray-900">Répondre au ticket</h3>
+        <h3 className="text-lg font-medium text-gray-900">
+          Répondre au ticket
+        </h3>
         <div className="relative">
           <textarea
             className="mt-2 w-full p-2 border border-gray-300 rounded-md"
@@ -113,21 +122,41 @@ const TicketDetail = () => {
       </div>
       <div className="bg-white shadow rounded-lg p-6">
         <h2 className="text-lg font-medium text-gray-900">Commentaires</h2>
-        {currentComments.map(comment => (
-          <div key={comment.id} className="mt-4 p-4 border border-gray-200 rounded-lg">
+        {currentComments.map((comment) => (
+          <div
+            key={comment.id}
+            className="mt-4 p-4 border border-gray-200 rounded-lg relative"
+          >
+            <p
+              className={`text-sm font-medium ${
+                comment.user_id === user?.id ? "text-left" : "text-right"
+              } text-gray-500`}
+            >
+              {comment.user_id === user?.id ? "Vous" : comment.user_id}
+            </p>
             <p className="text-gray-800">{comment.content}</p>
+            <p className="text-sm text-gray-500">
+              {new Date(comment.created_at).toLocaleString()}
+            </p>
           </div>
         ))}
         <div className="mt-4 flex justify-center space-x-2">
-          {Array.from({ length: Math.ceil(comments.length / commentsPerPage) }, (_, index) => (
-            <button
-              key={index}
-              className={`px-4 py-2 rounded-md ${currentPage === index + 1 ? 'bg-blue-600 text-white' : 'bg-gray-200 text-gray-800'}`}
-              onClick={() => handlePageChange(index + 1)}
-            >
-              {index + 1}
-            </button>
-          ))}
+          {Array.from(
+            { length: Math.ceil(comments.length / commentsPerPage) },
+            (_, index) => (
+              <button
+                key={index}
+                className={`px-4 py-2 rounded-md ${
+                  currentPage === index + 1
+                    ? "bg-blue-600 text-white"
+                    : "bg-gray-200 text-gray-800"
+                }`}
+                onClick={() => handlePageChange(index + 1)}
+              >
+                {index + 1}
+              </button>
+            )
+          )}
         </div>
       </div>
     </div>

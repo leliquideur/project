@@ -22,13 +22,33 @@ export async function createTicket(ticket: Omit<Ticket, 'id' | 'created_at' | 'u
 }
 
 export async function getTickets(): Promise<Ticket[]> {
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) throw new Error('User not authenticated');
+
+  const { data: userData, error: userError } = await supabase
+    .from('profiles')
+    .select('role')
+    .eq('id', user.id)
+    .single();
+
+  if (userError) throw userError;
+
+  const isAdmin = userData.role === 'admin';
+
   const { data, error } = await supabase
     .from('tickets')
     .select('*')
     .order('created_at', { ascending: false });
 
   if (error) throw error;
-  return data as Ticket[];
+
+  // Si l'utilisateur est un administrateur, retourner tous les tickets
+  if (isAdmin) {
+    return data as Ticket[];
+  }
+
+  // Sinon, filtrer les tickets par utilisateur
+  return data.filter(ticket => ticket.created_by === user.id) as Ticket[];
 }
 
 export async function getTicketById(id: string) {
