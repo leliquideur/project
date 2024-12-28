@@ -49,5 +49,21 @@
     "previous": "Previous",
     "next": "Next"
     
+  },
+  "Communt": {
+    "title": "Community",
+    "newPost": "New Post",
+    "search": "Search",
+    "searchPlaceholder": "Search by title",
+    "postTitle": "Post Title",
+    "author": "Author",
+    "created": "Created",
+    "actions": "Actions",
+    "noPosts": "No posts found",
+    "description": "Description",
+    "createdAt": "Created at",
+    "previous": "Previous",
+    "next": "Next",
+    "loading": "Loading..."
   }
 }

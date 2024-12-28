@@ -47,8 +47,24 @@
     "type_service_request": "Demande de service",
     "type_task": "Question",
     "previous": "Précédent",
-    "next": "Suivant"
-
-
+    "next": "Suivant",
+    "loading": "Chargement..."
+  },
+  "Communt": {
+    "title": "Communauté",
+    "newPost": "Nouveau post",
+    "search": "Rechercher",
+    "searchPlaceholder": "Rechercher par titre",
+    "postTitle": "Titre du post",
+    "author": "Auteur",
+    "created": "Créé",
+    "updated": "Mis à jour",
+    "actions": "Actions",
+    "noPosts": "Aucun post trouvé",
+    "description": "Description",
+    "createdAt": "Créé à",
+    "previous": "Précédent",
+    "next": "Suivant",
+    "loading": "Chargement..."
   }
 }
