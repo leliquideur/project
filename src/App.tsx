@@ -40,36 +40,39 @@ import { CreateTicket } from './pages/ticket/CreateTicket';
 import { Profiles } from './pages/profile/Profiles';
 import { ProfileDetails } from './pages/profile/ProfileDetails';
 import { Settings } from "./pages/Settings";
+import ErrorBoundary from './components/ErrorBoundary';
 
 
 function App() {
 
 
   return (
-    <Router>
-      <AuthProvider>
-        <Routes>
-          <Route path="/" element={<Layout />}>
-            <Route path="/signup" element={<Signup />} />
-            <Route path="/login" element={<Login />} />
-            <Route path="/profiles" element={<Profiles />} />
+    <ErrorBoundary>
+      <Router>
+        <AuthProvider>
+          <Routes>
+            <Route path="/" element={<Layout />}>
+              <Route path="/signup" element={<Signup />} />
+              <Route path="/login" element={<Login />} />
+              <Route path="/profiles" element={<Profiles />} />
 
-            <Route element={<ProtectedRoute />}>
-              <Route path="/profiles/:id" element={<ProfileDetails />} />
-              <Route path="/dashboard" element={<Dashboard />}/>
-              <Route path="/tickets" element={<TicketList />} />
-              <Route path="/tickets/new" element={<CreateTicket />} />
-              <Route path="/tickets/:id" element={<TicketDetail />} />
-              <Route path="/settings" element={<Settings />} />
+              <Route element={<ProtectedRoute />}>
+                <Route path="/profiles/:id" element={<ProfileDetails />} />
+                <Route path="/dashboard" element={<Dashboard />} />
+                <Route path="/tickets" element={<TicketList />} />
+                <Route path="/tickets/new" element={<CreateTicket />} />
+                <Route path="/tickets/:id" element={<TicketDetail />} />
+                <Route path="/settings" element={<Settings />} />
+              </Route>
+              <Route
+                path="*"
+                element={<Navigate to="/?error=invalid-path" />}
+              />
             </Route>
-            <Route
-              path="*"
-              element={<Navigate to="/?error=invalid-path" />}
-            />
-          </Route>
-        </Routes>
-      </AuthProvider>
-    </Router>
+          </Routes>
+        </AuthProvider>
+      </Router>
+    </ErrorBoundary>
   );
 }
 

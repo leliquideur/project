@@ -5,8 +5,14 @@ import supabase from "../../api/supabaseClient";
 
 export function Login() {
   const { t } = useTranslation();
-  const [email, setEmail] = useState("le.liquideur01@gmail.com"); // Valeur forcée
-  const [password, setPassword] = useState("Jesuisici13"); // Valeur forcée
+  const [email, setEmail] = useState(
+    process.env.NODE_ENV === "development" ? import.meta.env.VITE_EMAIL_SUPABASE : ""
+  ); // Valeur forcée en dev
+  const [password, setPassword] = useState(
+    process.env.NODE_ENV === "development"
+      ? import.meta.env.VITE_PASSWORD_SUPABASE
+      : ""
+  ); // Valeur forcée en dev
   const [error, setError] = useState("");
 
   const handleSubmit = async (e: React.FormEvent) => {
