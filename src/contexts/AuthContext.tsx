@@ -76,7 +76,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     fetchUser();
 
     const { data: authListener } = supabase.auth.onAuthStateChange(
-      (event, _session) => {
+      (event: string, _session: any) => {
         if (event === "SIGNED_IN" || event === "SIGNED_OUT") {
           fetchUser();
         }

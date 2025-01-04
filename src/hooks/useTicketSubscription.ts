@@ -3,7 +3,7 @@ import supabase from '../api/supabaseClient';
 import { useTicketStore } from '../store/ticketStore';
 
 export function useTicketSubscription() {
-  const fetchTickets = useTicketStore((state) => state.fetchTickets);
+  const fetchTickets = useTicketStore((state: { fetchTickets: () => void }) => state.fetchTickets);
 
   useEffect(() => {
     const subscription = supabase

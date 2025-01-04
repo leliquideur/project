@@ -46,7 +46,7 @@ function App() {
 
 
   return (
-    <Router future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
+    <Router>
       <AuthProvider>
         <Routes>
           <Route path="/" element={<Layout />}>
