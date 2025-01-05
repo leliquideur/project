@@ -313,6 +313,54 @@ export async function closeTicket(id: string, userId: string): Promise<void> {
     throw historyError;
   }
 }
+export async function startProgress(ticketId: string, userId: string): Promise<void> {
+  // Récupérer le statut actuel du ticket
+  const { data: ticket, error: fetchError } = await supabase
+    .from('tickets')
+    .select('status')
+    .eq('id', ticketId)
+    .single();
+
+  if (fetchError) {
+    console.error(fetchError);
+    throw fetchError;
+  }
+
+  const oldStatus = ticket.status;
+
+  if (oldStatus === 'new') {
+    const newStatus = 'in_progress';
+
+    // Mettre à jour le statut du ticket
+    const { error: updateError } = await supabase
+      .from('tickets')
+      .update({ status: newStatus })
+      .eq('id', ticketId);
+
+    if (updateError) {
+      console.error(updateError);
+      throw updateError;
+    }
+
+    // Insérer un nouvel historique de statut
+    const { error: historyError } = await supabase
+      .from('ticket_status_history')
+      .insert([
+        {
+          ticket_id: ticketId,
+          old_status: oldStatus,
+          new_status: newStatus,
+          changed_by: userId,
+          created_at: new Date().toISOString(),
+        },
+      ]);
+
+    if (historyError) {
+      console.error(historyError);
+      throw historyError;
+    }
+  }
+}
 
 export async function handleCloseTicket(id: string, userId: string): Promise<void> {
   try {

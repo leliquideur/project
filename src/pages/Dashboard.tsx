@@ -54,11 +54,46 @@ export const Dashboard: React.FC = () => {
   return (
     <div className="space-y-6">
       <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
-        {renderStatCard("Haute Priorité", stats.highPriority, AlertCircle, "text-red-600", "bg-red-50", "high")}
-        {renderStatCard("Nouveaux", stats.new, Clock, "text-yellow-600", "bg-yellow-50", "new")}
-        {renderStatCard("En Progression", stats.inProgress, BarChart3, "text-blue-600", "bg-blue-50", "in_progress")}
-        {renderStatCard("Résolus", stats.resolved, CheckCircle2, "text-green-600", "bg-green-50", "resolved")}
-        {renderStatCard("Sans filtre", 0, XCircle, "text-red-600", "bg-purple-50", null)}
+        {renderStatCard(
+          "Haute Priorité",
+          stats.highPriority,
+          AlertCircle,
+          "text-red-600",
+          "bg-red-50",
+          "high"
+        )}
+        {renderStatCard(
+          "Nouveaux",
+          stats.new,
+          Clock,
+          "text-yellow-600",
+          "bg-yellow-50",
+          "new"
+        )}
+        {renderStatCard(
+          "En Progression",
+          stats.inProgress,
+          BarChart3,
+          "text-blue-600",
+          "bg-blue-50",
+          "in_progress"
+        )}
+        {renderStatCard(
+          "Résolus",
+          stats.resolved,
+          CheckCircle2,
+          "text-green-600",
+          "bg-green-50",
+          "resolved"
+        )}
+        {renderStatCard(
+          "Sans filtre",
+          0,
+          XCircle,
+          "text-red-600",
+          "bg-purple-50",
+          null
+        )}
       </div>
 
       <div className="bg-white shadow rounded-lg p-6">
@@ -70,7 +105,15 @@ export const Dashboard: React.FC = () => {
             <Link
               key={ticket.id}
               to={`/tickets/${ticket.id}`}
-              className="block p-4 rounded-lg border border-gray-200 hover:border-primary-300 hover:bg-gray-50"
+              className={`block p-4 rounded-lg border border-gray-200 hover:border-primary-300  ${
+                ticket.status === "new"
+                  ? "text-yellow-600 bg-yellow-50 hover:bg-yellow-100"
+                  : ticket.status === "in_progress"
+                  ? "text-blue-600 bg-blue-50 hover:bg-blue-100"
+                  : ticket.status === "resolved"
+                  ? "text-green-600 bg-green-50 hover:bg-green-100"
+                  : "text-gray-600 bg-gray-50 hover:bg-gray-100"
+              }`}
             >
               <div className="flex justify-between">
                 <h3 className="text-sm font-medium text-gray-900">

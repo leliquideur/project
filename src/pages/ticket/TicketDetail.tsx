@@ -1,6 +1,6 @@
-import React, { useEffect, useState, useContext } from 'react';
-import { useParams, useNavigate, Link } from 'react-router-dom';
-import { useAuth } from '../../hooks/useAuth';
+import React, { useEffect, useState, useContext } from "react";
+import { useParams, useNavigate, Link } from "react-router-dom";
+import { useAuth } from "../../hooks/useAuth";
 import {
   getTicketById,
   getCommentsByTicketId,
@@ -9,12 +9,13 @@ import {
   getLastStatusHistory,
   fetchTicketData,
   deleteComment,
+  startProgress,
+  handleCloseTicket,
 } from "../../api/ticketsService";
-import { getFullNameById } from '../../api/profilesService';
+import { getFullNameById } from "../../api/profilesService";
 import { Ticket, Comment, TicketStatusHistory } from "../../types";
-import TextAreaWithCounter from '../../components/TextAreaWithCounter';
-import { handleCloseTicket } from "../../api/ticketsService";
-import { AuthContext } from '../../contexts/AuthContext';
+import TextAreaWithCounter from "../../components/TextAreaWithCounter";
+import { AuthContext } from "../../contexts/AuthContext";
 
 interface ExtendedTicketStatusHistory extends TicketStatusHistory {
   full_name: string;
@@ -163,7 +164,6 @@ const TicketDetail = () => {
         const userData = await getUserById(ticketData.created_by);
         setCreatedByUser(userData);
 
-
         await refreshComments();
       } catch (err) {
         console.error(err);
@@ -194,6 +194,11 @@ const TicketDetail = () => {
     try {
       await postCommentReply(id!, replyText, user?.id || "");
       await refreshComments();
+      if (comments.length === 0 && ticket?.status === "new") {
+        if (ticket?.id && user?.id) {
+          await startProgress(ticket.id, user.id);
+        }
+      }
     } catch (err: any) {
       console.error(err);
       setError("Erreur lors de l'envoi de la réponse.");
@@ -242,18 +247,18 @@ const TicketDetail = () => {
     }
   };
 
-const handleDelete = async (commentId: string) => {
-  try {
-    await deleteComment(commentId);
-    // Mettre à jour l'état des commentaires après suppression
-    setComments((prevComments) =>
-      prevComments.filter((comment) => comment.id !== commentId)
-    );
-  } catch (error) {
-    console.error("Erreur lors de la suppression du commentaire:", error);
-    // Optionnel : afficher une notification d'erreur à l'utilisateur
-  }
-};
+  const handleDelete = async (commentId: string) => {
+    try {
+      await deleteComment(commentId);
+      // Mettre à jour l'état des commentaires après suppression
+      setComments((prevComments) =>
+        prevComments.filter((comment) => comment.id !== commentId)
+      );
+    } catch (error) {
+      console.error("Erreur lors de la suppression du commentaire:", error);
+      // Optionnel : afficher une notification d'erreur à l'utilisateur
+    }
+  };
 
   return (
     <div className="space-y-6">
@@ -271,7 +276,17 @@ const handleDelete = async (commentId: string) => {
           Détails du Ticket{" "}
           {!(ticket?.status == "resolved") && (
             <button
-              className="mt-4 px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 float-right"
+              className="
+              mt-4 px-4   
+              py-2 
+              bg-green-600 
+              text-white rounded-md 
+              hover:bg-green-700 
+              float-right 
+              hover:shadow-lg 
+              hover:scale-105 
+              transition-transform 
+              duration-550`}"
               onClick={handleClose}
             >
               Clôturer le ticket
@@ -336,8 +351,10 @@ const handleDelete = async (commentId: string) => {
             </p>
             <p className="mt-1 text-gray-700">{comment.content}</p>
             {index === 0 &&
-              comment.user_id === currentUserId &&
-              currentPage === 1 && (
+              (comment.user_id === currentUserId || user?.role === "admin") &&
+              currentPage === 1 &&
+              ticket?.status !== "resolved" &&
+              (
                 <button
                   className="absolute top-0 right-2 mt-0 ml-0 text-red-500 hover:text-red-700"
                   onClick={async () => {
