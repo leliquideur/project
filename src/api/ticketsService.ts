@@ -1,6 +1,6 @@
 import supabase  from './supabaseClient';
 import { Ticket, Comment, TicketStatusHistory } from '../types';
-import { getCurrentProfile } from './profilesService';
+import { getCurrentProfile, getFullNameById } from './profilesService';
 
 export async function createTicket(ticket: Omit<Ticket, 'id' | 'created_at' | 'updated_at' | 'created_by'>) {
   const { data: { user } } = await supabase.auth.getUser();
@@ -260,50 +260,79 @@ export async function postCommentReply(ticketId: string, text: string, userId: s
   return data;
 }
 
-export async function closeTicket(id: string): Promise<void> {
+export async function closeTicket(id: string, userId: string): Promise<void> {
+  // Récupérer le statut actuel du ticket
+  const { data: ticket, error: fetchError } = await supabase
+    .from('tickets')
+    .select('status')
+    .eq('id', id)
+    .single();
+
+  if (fetchError) {
+    console.error(fetchError);
+    throw fetchError;
+  }
+
+  const oldStatus = ticket.status;
+  const isClosed = 'resolved';
+
+  // Mettre à jour le statut du ticket
   const { data, error } = await supabase
     .from('tickets')
-    .update({ status: 'closed' })
+    .update({ status: isClosed })
     .eq('id', id);
-    if (process.env.NODE_ENV === 'development') {
-      console.log('ticketId', id);
-      console.log('data', data);
-      console.log('error', error);
-
-    }
 
   if (error) {
+    console.error(error);
     throw error;
   }
 
-  if (!data) {
-    //throw new Error('Ticket non trouvé ou déjà clôturé.');
+  // Insérer un nouvel historique de statut
+  const { error: historyError } = await supabase
+    .from('ticket_status_history')
+    .insert([
+      {
+        ticket_id: id,
+        old_status: oldStatus,
+        new_status: isClosed,
+        changed_by: userId,
+        created_at: new Date().toISOString(),
+      },
+    ]);
+
+  if (historyError) {
+    console.error(historyError);
+    throw historyError;
   }
 }
 
-export async function handleCloseTicket(id: string): Promise<void> {
+export async function handleCloseTicket(id: string, userId: string): Promise<void> {
   try {
-    await closeTicket(id);
+    await closeTicket(id, userId);
   } catch (error: any) {
     console.error(error);
     throw new Error("Erreur lors de la clôture du ticket.");
   }
 }
 
-export async function getLastStatusHistory(ticketId: string): Promise<TicketStatusHistory | null> {
+export async function getLastStatusHistory(ticketId: string): Promise<(TicketStatusHistory & { full_name: string }) | null> {
   const { data, error } = await supabase
     .from('ticket_status_history')
     .select('*')
     .eq('ticket_id', ticketId)
-    .order('craeted_at', { ascending: false })
+    .order('created_at', { ascending: false })
     .limit(1)
-    .single();
+    .maybeSingle();
 
   if (error) {
     console.error(error);
     return null;
   }
 
-  return data;
-}
+  if (data) {
+    const fullName = await getFullNameById(data.changed_by);
+    return { ...data, full_name: fullName };
+  }
 
+  return null;
+}

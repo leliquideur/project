@@ -1,5 +1,5 @@
 //export type UserRole = 'client' | 'technician' | 'admin';
-export type TicketStatus = 'new' | 'assigned' | 'in_progress' | 'on_hold' | 'resolved' | 'closed';
+export type TicketStatus = 'new' | 'in_progress' | 'resolved' | 'closed';
 export type TicketPriority = 'low' | 'medium' | 'high' | 'urgent';
 export type TicketType = 'problem' | 'task' | 'service_request';
 

@@ -15,6 +15,10 @@ import TextAreaWithCounter from '../../components/TextAreaWithCounter';
 import { handleCloseTicket } from "../../api/ticketsService";
 import { AuthContext } from '../../contexts/AuthContext';
 
+interface ExtendedTicketStatusHistory extends TicketStatusHistory {
+  full_name: string;
+}
+
 /**
  * Component for displaying the details of a ticket, including its comments and the ability to reply.
  *
@@ -96,12 +100,15 @@ const TicketDetail = () => {
   const [comments, setComments] = useState<Comment[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
-  const [createdByUser, setCreatedByUser] = useState<{ full_name: string; email: string } | null>(null);
-  const [replyText, setReplyText] = useState<string>('');
+  const [createdByUser, setCreatedByUser] = useState<{
+    full_name: string;
+    email: string;
+  } | null>(null);
+  const [replyText, setReplyText] = useState<string>("");
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [userNames, setUserNames] = useState<Record<string, string>>({});
   const [lastStatusHistory, setLastStatusHistory] =
-    useState<TicketStatusHistory | null>(null);
+    useState<ExtendedTicketStatusHistory | null>(null);
   const commentsPerPage = 5;
   const maxReplyLength = 1000;
   const authContext = useContext(AuthContext); // Déstructuration pour obtenir user du contexte
@@ -120,16 +127,16 @@ const TicketDetail = () => {
       }
     }
 
-    setUserNames(prev => ({ ...prev, ...userNamesMap }));
+    setUserNames((prev) => ({ ...prev, ...userNamesMap }));
   };
 
   const refreshComments = async () => {
     try {
       const commentsData = await getCommentsByTicketId(id!);
       setComments(commentsData);
-      setReplyText('');
+      setReplyText("");
 
-      const userIds = commentsData.map(comment => comment.user_id);
+      const userIds = commentsData.map((comment) => comment.user_id);
       await fetchUserNames(userIds);
     } catch (err: any) {
       console.error(err);
@@ -147,12 +154,13 @@ const TicketDetail = () => {
 
     const fetchData = async () => {
       try {
-        console.log(`Fetching ticket with ID: ${id}`);
+        //if(process.env.NODE_ENV === 'development') console.log(`Fetching ticket with ID: ${id}`);
         const ticketData = await getTicketById(id);
         setTicket(ticketData);
 
         const userData = await getUserById(ticketData.created_by);
         setCreatedByUser(userData);
+
 
         await refreshComments();
       } catch (err) {
@@ -166,6 +174,14 @@ const TicketDetail = () => {
     fetchData();
   }, [id]);
 
+  useEffect(() => {
+    const fetchHistory = async () => {
+      const history = await getLastStatusHistory(id!);
+      setLastStatusHistory(history);
+    };
+    fetchHistory();
+  }, [id]);
+
   const handleReplyChange = (text: string) => {
     setReplyText(text);
   };
@@ -174,7 +190,7 @@ const TicketDetail = () => {
     if (!replyText) return;
 
     try {
-      await postCommentReply(id!, replyText, user?.id || '');
+      await postCommentReply(id!, replyText, user?.id || "");
       await refreshComments();
     } catch (err: any) {
       console.error(err);
@@ -182,41 +198,54 @@ const TicketDetail = () => {
     }
   };
 
-
+  // Fonction pour gérer le changement de page
   const handlePageChange = (pageNumber: number) => {
     setCurrentPage(pageNumber);
   };
 
   const indexOfLastComment = currentPage * commentsPerPage;
   const indexOfFirstComment = indexOfLastComment - commentsPerPage;
-  const currentComments = comments.slice(indexOfFirstComment, indexOfLastComment);
+  const currentComments = comments.slice(
+    indexOfFirstComment,
+    indexOfLastComment
+  );
 
   if (loading) return <div className="text-center py-12">Chargement...</div>;
-  if (error) return <div className="text-center py-12 text-red-500">{error}</div>;
-
-
+  if (error)
+    return <div className="text-center py-12 text-red-500">{error}</div>;
 
   const handleClose = async () => {
     try {
-      await handleCloseTicket(id!);
+      setLoading(true);
       if (user) {
-        const { ticketData, commentsData } = await fetchTicketData(id!, user.id);
+        await handleCloseTicket(id!, user.id); // Passez user.id ici
+      } else {
+        setError("User not authenticated.");
+      }
+      if (user) {
+        const { ticketData, commentsData } = await fetchTicketData(
+          id!,
+          user.id
+        );
         setTicket(ticketData);
         setComments(commentsData);
         const history = await getLastStatusHistory(id!);
         setLastStatusHistory(history);
+        console.log("Ticket closed successfully", ticketData);
       }
     } catch (err: any) {
       setError(err.message);
+    } finally {
+      setLoading(false);
     }
   };
-  
+
   return (
     <div className="space-y-6">
       <div className="bg-white shadow rounded-lg p-6">
         <h1 className="text-lg font-medium text-gray-900">
           Détails du Ticket{" "}
-          {!(ticket?.status == "closed") && (
+          {!(ticket?.status == "resolved") && (
             <button
               className="mt-4 px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 float-right"
               onClick={handleClose}
@@ -240,17 +269,16 @@ const TicketDetail = () => {
           </div>
         )}
       </div>
-      {lastStatusHistory && (
+      {lastStatusHistory && ticket?.status == "resolved" && (
         <div className="mb-4 p-4 bg-gray-100 border rounded">
           <h3 className="text-md font-semibold">
-            Dernier historique de statut
+            Ticket résolut le{" "}
+            {new Date(lastStatusHistory.created_at).toLocaleString()} par{" "}
+            {lastStatusHistory.full_name}
           </h3>
-          <p>Status: {lastStatusHistory.old_status}</p>
-          <p>Date: {new Date(lastStatusHistory.created_at).toLocaleString()}</p>
-          <p>Modifié par: {lastStatusHistory.changed_by}</p>
         </div>
       )}
-      {!(ticket?.status == "closed") && (
+      {!(ticket?.status == "resolved") && (
         <div className="bg-white shadow rounded-lg p-6">
           <h3 className="text-lg font-medium text-gray-900">
             Répondre au ticket
