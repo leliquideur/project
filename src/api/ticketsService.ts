@@ -1,5 +1,5 @@
 import supabase  from './supabaseClient';
-import { Ticket, Comment } from '../types';
+import { Ticket, Comment, TicketStatusHistory } from '../types';
 import { getCurrentProfile } from './profilesService';
 
 export async function createTicket(ticket: Omit<Ticket, 'id' | 'created_at' | 'updated_at' | 'created_by'>) {
@@ -277,6 +277,32 @@ export async function closeTicket(id: string): Promise<void> {
   }
 
   if (!data) {
-    throw new Error('Ticket non trouvé ou déjà clôturé.');
+    //throw new Error('Ticket non trouvé ou déjà clôturé.');
   }
+}
+
+export async function handleCloseTicket(id: string): Promise<void> {
+  try {
+    await closeTicket(id);
+  } catch (error: any) {
+    console.error(error);
+    throw new Error("Erreur lors de la clôture du ticket.");
+  }
+}
+
+export async function getLastStatusHistory(ticketId: string): Promise<TicketStatusHistory | null> {
+  const { data, error } = await supabase
+    .from('ticket_status_history')
+    .select('*')
+    .eq('ticket_id', ticketId)
+    .order('craeted_at', { ascending: false })
+    .limit(1)
+    .single();
+
+  if (error) {
+    console.error(error);
+    return null;
+  }
+
+  return data;
 }

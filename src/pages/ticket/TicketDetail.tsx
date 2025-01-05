@@ -6,12 +6,12 @@ import {
   getCommentsByTicketId,
   postCommentReply,
   getUserById,
-  closeTicket,
+  getLastStatusHistory,
 } from "../../api/ticketsService";
 import { getFullNameById } from '../../api/profilesService';
-import { Ticket, Comment } from '../../types';
+import { Ticket, Comment, TicketStatusHistory } from "../../types";
 import TextAreaWithCounter from '../../components/TextAreaWithCounter';
-import supabase from '../../api/supabaseClient';
+import { handleCloseTicket } from "../../api/ticketsService";
 
 /**
  * Component for displaying the details of a ticket, including its comments and the ability to reply.
@@ -98,6 +98,8 @@ const TicketDetail = () => {
   const [replyText, setReplyText] = useState<string>('');
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [userNames, setUserNames] = useState<Record<string, string>>({});
+  const [lastStatusHistory, setLastStatusHistory] =
+    useState<TicketStatusHistory | null>(null);
   const commentsPerPage = 5;
   const maxReplyLength = 1000;
   const { user } = useAuth(); // Déstructuration pour obtenir user du contexte
@@ -189,26 +191,32 @@ const TicketDetail = () => {
   if (loading) return <div className="text-center py-12">Chargement...</div>;
   if (error) return <div className="text-center py-12 text-red-500">{error}</div>;
 
-  const handleCloseTicket = async () => {
+
+
+  const handleClose = async () => {
     try {
-      await closeTicket(id!);
-      navigate('/tickets');
+      await handleCloseTicket(id!);
+      const history = await getLastStatusHistory(id!);
+      setLastStatusHistory(history);
     } catch (err: any) {
-      console.error(err);
-      setError("Erreur lors de la clôture du ticket.");
+      setError(err.message);
     }
   };
-
+  
   return (
     <div className="space-y-6">
       <div className="bg-white shadow rounded-lg p-6">
-        <button
-          className="mt-4 px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 float-right"
-          onClick={handleCloseTicket}
-        >
-          Clôturer le ticket
-        </button>
-        <h1 className="text-lg font-medium text-gray-900">Détails du Ticket</h1>
+        <h1 className="text-lg font-medium text-gray-900">
+          Détails du Ticket{" "}
+          {!(ticket?.status == "closed") && (
+            <button
+              className="mt-4 px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 float-right"
+              onClick={() => handleCloseTicket(id!)}
+            >
+              Clôturer le ticket
+            </button>
+          )}
+        </h1>
         {ticket && (
           <div className="mt-4">
             <h2 className="text-xl font-semibold text-gray-800">
@@ -224,22 +232,34 @@ const TicketDetail = () => {
           </div>
         )}
       </div>
-      <div className="bg-white shadow rounded-lg p-6">
-        <h3 className="text-lg font-medium text-gray-900">
-          Répondre au ticket
-        </h3>
-        <TextAreaWithCounter
-          value={replyText}
-          onChange={handleReplyChange}
-          maxLength={maxReplyLength}
-        />
-        <button
-          className="mt-2 px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
-          onClick={handleReplySubmit}
-        >
-          Répondre
-        </button>
-      </div>
+      {lastStatusHistory && (
+        <div className="mb-4 p-4 bg-gray-100 border rounded">
+          <h3 className="text-md font-semibold">
+            Dernier historique de statut
+          </h3>
+          <p>Status: {lastStatusHistory.old_status}</p>
+          <p>Date: {new Date(lastStatusHistory.created_at).toLocaleString()}</p>
+          <p>Modifié par: {lastStatusHistory.changed_by}</p>
+        </div>
+      )}
+      {!(ticket?.status == "closed") && (
+        <div className="bg-white shadow rounded-lg p-6">
+          <h3 className="text-lg font-medium text-gray-900">
+            Répondre au ticket
+          </h3>
+          <TextAreaWithCounter
+            value={replyText}
+            onChange={handleReplyChange}
+            maxLength={maxReplyLength}
+          />
+          <button
+            className="mt-2 px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
+            onClick={handleReplySubmit}
+          >
+            Répondre
+          </button>
+        </div>
+      )}
       <div className="bg-white shadow rounded-lg p-6">
         <h2 className="text-lg font-medium text-gray-900">Commentaires</h2>
         {currentComments.map((comment) => (
