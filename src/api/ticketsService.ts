@@ -328,7 +328,7 @@ export async function startProgress(ticketId: string, userId: string): Promise<v
 
   const oldStatus = ticket.status;
 
-  if (oldStatus === 'new') {
+  if (oldStatus === 'new' || oldStatus === 'resolved') {
     const newStatus = 'in_progress';
 
     // Mettre à jour le statut du ticket

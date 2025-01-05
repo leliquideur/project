@@ -196,6 +196,8 @@ const TicketDetail = () => {
       await refreshComments();
       if (comments.length === 0 && ticket?.status === "new") {
         if (ticket?.id && user?.id) {
+          console.log("Starting progress for ticket", ticket.id);
+          console.log("User ID", user.id);
           await startProgress(ticket.id, user.id);
         }
       }
@@ -287,7 +289,15 @@ const TicketDetail = () => {
               hover:scale-105 
               transition-transform 
               duration-550`}"
-              onClick={handleClose}
+              onClick={() => {
+                if (
+                  window.confirm(
+                    "Êtes-vous sûr de vouloir clôturer ce ticket ?"
+                  )
+                ) {
+                  handleClose();
+                }
+              }}
             >
               Clôturer le ticket
             </button>
@@ -353,8 +363,7 @@ const TicketDetail = () => {
             {index === 0 &&
               (comment.user_id === currentUserId || user?.role === "admin") &&
               currentPage === 1 &&
-              ticket?.status !== "resolved" &&
-              (
+              ticket?.status !== "resolved" && (
                 <button
                   className="absolute top-0 right-2 mt-0 ml-0 text-red-500 hover:text-red-700"
                   onClick={async () => {
