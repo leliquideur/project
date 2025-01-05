@@ -306,3 +306,4 @@ export async function getLastStatusHistory(ticketId: string): Promise<TicketStat
 
   return data;
 }
+

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useContext } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../../hooks/useAuth';
 import {
@@ -7,11 +7,13 @@ import {
   postCommentReply,
   getUserById,
   getLastStatusHistory,
+  fetchTicketData,
 } from "../../api/ticketsService";
 import { getFullNameById } from '../../api/profilesService';
 import { Ticket, Comment, TicketStatusHistory } from "../../types";
 import TextAreaWithCounter from '../../components/TextAreaWithCounter';
 import { handleCloseTicket } from "../../api/ticketsService";
+import { AuthContext } from '../../contexts/AuthContext';
 
 /**
  * Component for displaying the details of a ticket, including its comments and the ability to reply.
@@ -102,7 +104,8 @@ const TicketDetail = () => {
     useState<TicketStatusHistory | null>(null);
   const commentsPerPage = 5;
   const maxReplyLength = 1000;
-  const { user } = useAuth(); // Déstructuration pour obtenir user du contexte
+  const authContext = useContext(AuthContext); // Déstructuration pour obtenir user du contexte
+  const user = authContext?.user;
 
   const fetchUserNames = async (userIds: string[]) => {
     const uniqueUserIds = Array.from(new Set(userIds));
@@ -196,8 +199,13 @@ const TicketDetail = () => {
   const handleClose = async () => {
     try {
       await handleCloseTicket(id!);
-      const history = await getLastStatusHistory(id!);
-      setLastStatusHistory(history);
+      if (user) {
+        const { ticketData, commentsData } = await fetchTicketData(id!, user.id);
+        setTicket(ticketData);
+        setComments(commentsData);
+        const history = await getLastStatusHistory(id!);
+        setLastStatusHistory(history);
+      }
     } catch (err: any) {
       setError(err.message);
     }
@@ -211,7 +219,7 @@ const TicketDetail = () => {
           {!(ticket?.status == "closed") && (
             <button
               className="mt-4 px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 float-right"
-              onClick={() => handleCloseTicket(id!)}
+              onClick={handleClose}
             >
               Clôturer le ticket
             </button>
