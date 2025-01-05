@@ -116,6 +116,7 @@ const TicketDetail = () => {
   const authContext = useContext(AuthContext); // Déstructuration pour obtenir user du contexte
   const user = authContext?.user;
   const currentUserId = user?.id;
+  const [refresh, setRefresh] = useState(false);
 
   const fetchUserNames = async (userIds: string[]) => {
     const uniqueUserIds = Array.from(new Set(userIds));
@@ -174,7 +175,7 @@ const TicketDetail = () => {
     };
 
     fetchData();
-  }, [id]);
+  }, [id, refresh]);
 
   useEffect(() => {
     const fetchHistory = async () => {
@@ -199,6 +200,7 @@ const TicketDetail = () => {
           console.log("Starting progress for ticket", ticket.id);
           console.log("User ID", user.id);
           await startProgress(ticket.id, user.id);
+          setRefresh(!refresh);
         }
       }
     } catch (err: any) {
