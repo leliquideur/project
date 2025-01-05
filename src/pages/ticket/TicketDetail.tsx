@@ -1,11 +1,92 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../../hooks/useAuth';
-import { getTicketById, getCommentsByTicketId, postCommentReply, getUserById } from '../../api/ticketsService';
+import {
+  getTicketById,
+  getCommentsByTicketId,
+  postCommentReply,
+  getUserById,
+  closeTicket,
+} from "../../api/ticketsService";
 import { getFullNameById } from '../../api/profilesService';
 import { Ticket, Comment } from '../../types';
 import TextAreaWithCounter from '../../components/TextAreaWithCounter';
+import supabase from '../../api/supabaseClient';
 
+/**
+ * Component for displaying the details of a ticket, including its comments and the ability to reply.
+ *
+ * @component
+ * @returns {JSX.Element} The rendered component.
+ *
+ * @remarks
+ * This component fetches the ticket details and comments from the server using the ticket ID from the URL parameters.
+ * It allows the user to reply to the ticket and paginate through the comments.
+ *
+ * @example
+ * ```tsx
+ * <TicketDetail />
+ * ```
+ *
+ * @requires useParams
+ * @requires useNavigate
+ * @requires useState
+ * @requires useEffect
+ * @requires useAuth
+ * @requires getFullNameById
+ * @requires getCommentsByTicketId
+ * @requires getTicketById
+ * @requires getUserById
+ * @requires postCommentReply
+ * @requires closeTicket
+ *
+ * @function
+ * @name TicketDetail
+ *
+ * @typedef {Object} Ticket
+ * @property {string} id - The ID of the ticket.
+ * @property {string} title - The title of the ticket.
+ * @property {string} description - The description of the ticket.
+ * @property {string} created_by - The ID of the user who created the ticket.
+ * @property {string} created_at - The creation date of the ticket.
+ *
+ * @typedef {Object} Comment
+ * @property {string} id - The ID of the comment.
+ * @property {string} user_id - The ID of the user who made the comment.
+ * @property {string} content - The content of the comment.
+ * @property {string} created_at - The creation date of the comment.
+ *
+ * @typedef {Object} User
+ * @property {string} id - The ID of the user.
+ * @property {string} full_name - Le nom complet de l'utilisateur.
+ * @property {string} email - The email of the user.
+ *
+ * @typedef {Object} AuthContext
+ * @property {User} user - L'utilisateur authentifié.
+ *
+ * @param {Object} props - The component props.
+ * @param {string} props.id - The ID of the ticket from the URL parameters.
+ * @param {Function} props.navigate - The navigation function to redirect the user.
+ * @param {Ticket | null} props.ticket - The ticket details.
+ * @param {Function} props.setTicket - The function to set the ticket details.
+ * @param {Comment[]} props.comments - The list of comments for the ticket.
+ * @param {Function} props.setComments - The function to set the comments.
+ * @param {boolean} props.loading - The loading state of the component.
+ * @param {Function} props.setLoading - The function to set the loading state.
+ * @param {string | null} props.error - The error message, if any.
+ * @param {Function} props.setError - The function to set the error message.
+ * @param {User | null} props.createdByUser - The user who created the ticket.
+ * @param {Function} props.setCreatedByUser - The function to set the user who created the ticket.
+ * @param {string} props.replyText - The text of the reply.
+ * @param {Function} props.setReplyText - The function to set the reply text.
+ * @param {number} props.currentPage - The current page of comments.
+ * @param {Function} props.setCurrentPage - The function to set the current page of comments.
+ * @param {Record<string, string>} props.userNames - The map of user IDs to user names.
+ * @param {Function} props.setUserNames - The function to set the user names.
+ * @param {number} props.commentsPerPage - The number of comments per page.
+ * @param {number} props.maxReplyLength - The maximum length of the reply text.
+ * @param {AuthContext} props.auth - The authentication context.
+ */
 const TicketDetail = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
@@ -21,6 +102,36 @@ const TicketDetail = () => {
   const maxReplyLength = 1000;
   const { user } = useAuth(); // Déstructuration pour obtenir user du contexte
 
+  const fetchUserNames = async (userIds: string[]) => {
+    const uniqueUserIds = Array.from(new Set(userIds));
+    const userNamesMap: Record<string, string> = {};
+
+    for (const userId of uniqueUserIds) {
+      if (!userNames[userId]) {
+        const fullName = await getFullNameById(userId);
+        if (fullName) {
+          userNamesMap[userId] = fullName;
+        }
+      }
+    }
+
+    setUserNames(prev => ({ ...prev, ...userNamesMap }));
+  };
+
+  const refreshComments = async () => {
+    try {
+      const commentsData = await getCommentsByTicketId(id!);
+      setComments(commentsData);
+      setReplyText('');
+
+      const userIds = commentsData.map(comment => comment.user_id);
+      await fetchUserNames(userIds);
+    } catch (err: any) {
+      console.error(err);
+      setError("Erreur lors de la mise à jour des commentaires.");
+    }
+  };
+
   useEffect(() => {
     if (!id) {
       console.error("ID du ticket manquant.");
@@ -33,39 +144,22 @@ const TicketDetail = () => {
       try {
         console.log(`Fetching ticket with ID: ${id}`);
         const ticketData = await getTicketById(id);
-        const commentsData = await getCommentsByTicketId(id);
         setTicket(ticketData);
-        setComments(commentsData); // Trier les commentaires du plus récent au plus vieux
 
-        // Récupérer les informations de l'utilisateur qui a créé le ticket
         const userData = await getUserById(ticketData.created_by);
         setCreatedByUser(userData);
 
-        // Récupérer les noms complets des utilisateurs des commentaires
-        const userIds = commentsData.map(comment => comment.user_id);
-        const uniqueUserIds = Array.from(new Set(userIds));
-        const userNamesMap: Record<string, string> = {};
-
-        for (const userId of uniqueUserIds) {
-          if (!userNames[userId]) {
-            const fullName = await getFullNameById(userId);
-            if (fullName) {
-              userNamesMap[userId] = fullName;
-            }
-          }
-        }
-
-        setUserNames(prevUserNames => ({ ...prevUserNames, ...userNamesMap }));
-      } catch (err: any) {
-        console.error(`Error fetching ticket: ${err.message}`);
-        setError(err.message);
+        await refreshComments();
+      } catch (err) {
+        console.error(err);
+        setError("Erreur lors du chargement des données.");
       } finally {
         setLoading(false);
       }
     };
 
     fetchData();
-  }, [id, user]);
+  }, [id]);
 
   const handleReplyChange = (text: string) => {
     setReplyText(text);
@@ -76,31 +170,13 @@ const TicketDetail = () => {
 
     try {
       await postCommentReply(id!, replyText, user?.id || '');
-      // Re-fetch comments after posting reply
-      const commentsData = await getCommentsByTicketId(id!);
-      setComments(commentsData);
-      setReplyText('');
-
-      // Récupérer les noms complets des nouveaux utilisateurs des commentaires
-      const userIds = commentsData.map(comment => comment.user_id);
-      const uniqueUserIds = Array.from(new Set(userIds));
-      const userNamesMap: Record<string, string> = {};
-
-      for (const userId of uniqueUserIds) {
-        if (!userNames[userId]) {
-          const fullName = await getFullNameById(userId);
-          if (fullName) {
-            userNamesMap[userId] = fullName;
-          }
-        }
-      }
-
-      setUserNames(prevUserNames => ({ ...prevUserNames, ...userNamesMap }));
+      await refreshComments();
     } catch (err: any) {
-      console.error(`Error posting reply: ${err.message}`);
-      setError(err.message);
+      console.error(err);
+      setError("Erreur lors de l'envoi de la réponse.");
     }
   };
+
 
   const handlePageChange = (pageNumber: number) => {
     setCurrentPage(pageNumber);
@@ -113,21 +189,45 @@ const TicketDetail = () => {
   if (loading) return <div className="text-center py-12">Chargement...</div>;
   if (error) return <div className="text-center py-12 text-red-500">{error}</div>;
 
+  const handleCloseTicket = async () => {
+    try {
+      await closeTicket(id!);
+      navigate('/tickets');
+    } catch (err: any) {
+      console.error(err);
+      setError("Erreur lors de la clôture du ticket.");
+    }
+  };
+
   return (
     <div className="space-y-6">
       <div className="bg-white shadow rounded-lg p-6">
+        <button
+          className="mt-4 px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 float-right"
+          onClick={handleCloseTicket}
+        >
+          Clôturer le ticket
+        </button>
         <h1 className="text-lg font-medium text-gray-900">Détails du Ticket</h1>
         {ticket && (
           <div className="mt-4">
-            <h2 className="text-xl font-semibold text-gray-800">{ticket.title}</h2>
+            <h2 className="text-xl font-semibold text-gray-800">
+              {ticket.status} : {ticket.title}
+            </h2>
             <p className="mt-2 text-gray-600">{ticket.description}</p>
-            <p className="mt-2 text-gray-500">Créé par: {createdByUser?.full_name} ({createdByUser?.email})</p>
-            <p className="mt-2 text-gray-500">Date de création: {new Date(ticket.created_at).toLocaleString()}</p>
+            <p className="mt-2 text-gray-500">
+              Créé par: {createdByUser?.full_name} ({createdByUser?.email})
+            </p>
+            <p className="mt-2 text-gray-500">
+              Date de création: {new Date(ticket.created_at).toLocaleString()}
+            </p>
           </div>
         )}
       </div>
       <div className="bg-white shadow rounded-lg p-6">
-        <h3 className="text-lg font-medium text-gray-900">Répondre au ticket</h3>
+        <h3 className="text-lg font-medium text-gray-900">
+          Répondre au ticket
+        </h3>
         <TextAreaWithCounter
           value={replyText}
           onChange={handleReplyChange}
@@ -142,28 +242,48 @@ const TicketDetail = () => {
       </div>
       <div className="bg-white shadow rounded-lg p-6">
         <h2 className="text-lg font-medium text-gray-900">Commentaires</h2>
-        {currentComments.map(comment => (
-          <div key={comment.id} className="mt-4 p-4 border border-gray-200 rounded-lg relative">
-            <p className={`text-sm font-medium ${comment.user_id === user?.id ? 'text-left' : 'text-right'} text-gray-500`}>
-              {comment.user_id === user?.id ? 'Vous' : (
-                <Link to={`/profiles/${comment.user_id}`} className="text-blue-600 hover:underline">
-                  {userNames[comment.user_id] || comment.user_id}
+        {currentComments.map((comment) => (
+          <div
+            key={comment.id}
+            className="mt-4 p-4 border border-gray-200 rounded-lg relative"
+          >
+            <p
+              className={`text-sm font-medium ${
+                comment.user_id === user?.id ? "text-left" : "text-right"
+              } text-gray-500`}
+            >
+              {comment.user_id === user?.id ? (
+                "Vous"
+              ) : (
+                <Link
+                  to={`/profiles/${comment.user_id}`}
+                  className="text-blue-600 hover:underline"
+                >
+                  {comment.user?.full_name}
                 </Link>
-              )} le: {new Date(comment.created_at).toLocaleString()}
+              )}
             </p>
-            <p className="text-gray-800">{comment.content}</p>
+            <p className="mt-1 text-gray-700">{comment.content}</p>
           </div>
         ))}
+
         <div className="mt-4 flex justify-center space-x-2">
-          {Array.from({ length: Math.ceil(comments.length / commentsPerPage) }, (_, index) => (
-            <button
-              key={index}
-              className={`px-4 py-2 rounded-md ${currentPage === index + 1 ? 'bg-blue-600 text-white' : 'bg-gray-200 text-gray-800'}`}
-              onClick={() => handlePageChange(index + 1)}
-            >
-              {index + 1}
-            </button>
-          ))}
+          {Array.from(
+            { length: Math.ceil(comments.length / commentsPerPage) },
+            (_, index) => (
+              <button
+                key={index}
+                className={`px-4 py-2 rounded-md ${
+                  currentPage === index + 1
+                    ? "bg-blue-600 text-white"
+                    : "bg-gray-200 text-gray-800"
+                }`}
+                onClick={() => handlePageChange(index + 1)}
+              >
+                {index + 1}
+              </button>
+            )
+          )}
         </div>
       </div>
     </div>

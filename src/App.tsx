@@ -41,6 +41,7 @@ import { Profiles } from './pages/profile/Profiles';
 import { ProfileDetails } from './pages/profile/ProfileDetails';
 import { Settings } from "./pages/Settings";
 import ErrorBoundary from './components/ErrorBoundary';
+import React from 'react';
 
 
 function App() {
@@ -54,14 +55,14 @@ function App() {
             <Route path="/" element={<Layout />}>
               <Route path="/signup" element={<Signup />} />
               <Route path="/login" element={<Login />} />
-              <Route path="/profiles" element={<Profiles />} />
 
               <Route element={<ProtectedRoute />}>
-                <Route path="/profiles/:id" element={<ProfileDetails />} />
                 <Route path="/dashboard" element={<Dashboard />} />
                 <Route path="/tickets" element={<TicketList />} />
-                <Route path="/tickets/new" element={<CreateTicket />} />
                 <Route path="/tickets/:id" element={<TicketDetail />} />
+                <Route path="/tickets/new" element={<CreateTicket />} />
+                <Route path="/profiles" element={<Profiles />} />
+                <Route path="/profiles/:id" element={<ProfileDetails />} />
                 <Route path="/settings" element={<Settings />} />
               </Route>
               <Route

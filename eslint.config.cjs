@@ -9,7 +9,8 @@ export default tseslint.config(
   {
     env: {
       browser: true,
-      es2021: true
+      es2021: true,
+      node: true
     },
     extends: [
       js.configs.recommended,
@@ -49,5 +50,10 @@ export default tseslint.config(
       ],
       // Ajoutez d'autres règles ici
     },
+    settings: {
+      react: {
+        version: 'detect'
+      }
+    }
   }
 );

@@ -54,6 +54,7 @@ export interface TicketStatusHistory {
 
 // Ajout de l'interface Comment
 export interface Comment {
+  user: any;
   id: string;
   ticket_id: string;
   user_id: string ; //author

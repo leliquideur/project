@@ -259,3 +259,24 @@ export async function postCommentReply(ticketId: string, text: string, userId: s
   if (error) throw error;
   return data;
 }
+
+export async function closeTicket(id: string): Promise<void> {
+  const { data, error } = await supabase
+    .from('tickets')
+    .update({ status: 'closed' })
+    .eq('id', id);
+    if (process.env.NODE_ENV === 'development') {
+      console.log('ticketId', id);
+      console.log('data', data);
+      console.log('error', error);
+
+    }
+
+  if (error) {
+    throw error;
+  }
+
+  if (!data) {
+    throw new Error('Ticket non trouvé ou déjà clôturé.');
+  }
+}
