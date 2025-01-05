@@ -16,6 +16,7 @@ import { getFullNameById } from "../../api/profilesService";
 import { Ticket, Comment, TicketStatusHistory } from "../../types";
 import TextAreaWithCounter from "../../components/TextAreaWithCounter";
 import { AuthContext } from "../../contexts/AuthContext";
+import { useTranslation } from 'react-i18next';
 
 interface ExtendedTicketStatusHistory extends TicketStatusHistory {
   full_name: string;
@@ -117,6 +118,7 @@ const TicketDetail = () => {
   const user = authContext?.user;
   const currentUserId = user?.id;
   const [refresh, setRefresh] = useState(false);
+  const { t } = useTranslation();
 
   const fetchUserNames = async (userIds: string[]) => {
     const uniqueUserIds = Array.from(new Set(userIds));
@@ -270,14 +272,14 @@ const TicketDetail = () => {
         {lastStatusHistory && ticket?.status == "resolved" && (
           <div className="mb-4 p-4 bg-gray-100 border rounded">
             <h3 className="text-md text-center font-semibold">
-              Ticket résolut le{" "}
+              {t("TicketDetail.resolved")}
               {new Date(lastStatusHistory.created_at).toLocaleString()} par{" "}
               {lastStatusHistory.full_name}
             </h3>
           </div>
         )}
         <h1 className="text-lg font-medium text-gray-900">
-          Détails du Ticket{" "}
+          {t("TicketDetail.ticketDetails")}{" "}
           {!(ticket?.status == "resolved") && (
             <button
               className="
@@ -292,16 +294,12 @@ const TicketDetail = () => {
               transition-transform 
               duration-550`}"
               onClick={() => {
-                if (
-                  window.confirm(
-                    "Êtes-vous sûr de vouloir clôturer ce ticket ?"
-                  )
-                ) {
+                if (window.confirm(t("TicketDetail.areYouSureClose"))) {
                   handleClose();
                 }
               }}
             >
-              Clôturer le ticket
+              {t("TicketDetail.closeTicket")}
             </button>
           )}
         </h1>
@@ -312,10 +310,12 @@ const TicketDetail = () => {
             </h2>
             <p className="mt-2 text-gray-600">{ticket.description}</p>
             <p className="mt-2 text-gray-500">
-              Créé par: {createdByUser?.full_name} ({createdByUser?.email})
+              {t("TicketDetail.createdBy")}: {createdByUser?.full_name} (
+              {createdByUser?.email})
             </p>
             <p className="mt-2 text-gray-500">
-              Date de création: {new Date(ticket.created_at).toLocaleString()}
+              {t("TicketDetail.creationDate")}:{" "}
+              {new Date(ticket.created_at).toLocaleString()}
             </p>
           </div>
         )}
@@ -323,7 +323,7 @@ const TicketDetail = () => {
       {!(ticket?.status == "resolved") && (
         <div className="bg-white shadow rounded-lg p-6">
           <h3 className="text-lg font-medium text-gray-900">
-            Répondre au ticket
+            {t("TicketDetail.replyToTicket")}
           </h3>
           <TextAreaWithCounter
             value={replyText}
@@ -334,12 +334,14 @@ const TicketDetail = () => {
             className="mt-2 px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
             onClick={handleReplySubmit}
           >
-            Répondre
+            {t("TicketDetail.reply")}
           </button>
         </div>
       )}
       <div className="bg-white shadow rounded-lg p-6">
-        <h2 className="text-lg font-medium text-gray-900">Commentaires</h2>
+        <h2 className="text-lg font-medium text-gray-900">
+          {t("TicketDetail.comments")}
+        </h2>
         {currentComments.map((comment, index) => (
           <div
             key={comment.id}
@@ -351,7 +353,7 @@ const TicketDetail = () => {
               } text-gray-500`}
             >
               {comment.user_id === user?.id ? (
-                "Vous"
+                t("TicketDetail.you")
               ) : (
                 <Link
                   to={`/profiles/${comment.user_id}`}
@@ -371,7 +373,8 @@ const TicketDetail = () => {
                   onClick={async () => {
                     if (
                       window.confirm(
-                        "Êtes-vous sûr de vouloir supprimer ce commentaire ?"
+                        t("TicketDetail.confirmDeleteComment")
+                        
                       )
                     ) {
                       await handleDelete(comment.id);
