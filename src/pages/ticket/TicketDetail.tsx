@@ -243,6 +243,15 @@ const TicketDetail = () => {
   return (
     <div className="space-y-6">
       <div className="bg-white shadow rounded-lg p-6">
+          {lastStatusHistory && ticket?.status == "resolved" && (
+            <div className="mb-4 p-4 bg-gray-100 border rounded">
+              <h3 className="text-md text-center font-semibold">
+                Ticket résolut le{" "}
+                {new Date(lastStatusHistory.created_at).toLocaleString()} par{" "}
+                {lastStatusHistory.full_name}
+              </h3>
+            </div>
+          )}
         <h1 className="text-lg font-medium text-gray-900">
           Détails du Ticket{" "}
           {!(ticket?.status == "resolved") && (
@@ -269,15 +278,6 @@ const TicketDetail = () => {
           </div>
         )}
       </div>
-      {lastStatusHistory && ticket?.status == "resolved" && (
-        <div className="mb-4 p-4 bg-gray-100 border rounded">
-          <h3 className="text-md font-semibold">
-            Ticket résolut le{" "}
-            {new Date(lastStatusHistory.created_at).toLocaleString()} par{" "}
-            {lastStatusHistory.full_name}
-          </h3>
-        </div>
-      )}
       {!(ticket?.status == "resolved") && (
         <div className="bg-white shadow rounded-lg p-6">
           <h3 className="text-lg font-medium text-gray-900">
