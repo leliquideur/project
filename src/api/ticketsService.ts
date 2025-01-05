@@ -1,6 +1,7 @@
 import supabase  from './supabaseClient';
 import { Ticket, Comment, TicketStatusHistory } from '../types';
 import { getCurrentProfile, getFullNameById } from './profilesService';
+import { User } from 'lucide-react';
 
 export async function createTicket(ticket: Omit<Ticket, 'id' | 'created_at' | 'updated_at' | 'created_by'>) {
   const { data: { user } } = await supabase.auth.getUser();
@@ -218,8 +219,15 @@ export async function loadTicketsWithPagination(
  * @returns Une promesse contenant les données du ticket et les commentaires associés.
  */
 export async function fetchTicketData(id: string, userId: string) {
+  const profile = await getCurrentProfile();
+  if (!profile) throw new Error('Utilisateur non authentifié');
   const ticketData = await getTicketById(id);
-  if (ticketData.assigned_to !== userId && ticketData.created_by !== userId) {
+  if(process.env.NODE_ENV === 'development') {
+    console.log('ticketData', ticketData);
+    console.log('userId', userId);
+    console.log('User.name', User.name);
+  }
+  if (ticketData.assigned_to !== userId && ticketData.created_by !== userId  && profile.role != 'admin') {
     throw new Error("Accès refusé.");
   }
   const commentsData = await getCommentsByTicketId(id);
@@ -335,4 +343,17 @@ export async function getLastStatusHistory(ticketId: string): Promise<(TicketSta
   }
 
   return null;
+}
+export async function deleteComment(commentId: string): Promise<void> {
+  const { error } = await supabase
+    .from('ticket_comments')
+    .delete()
+    .eq('id', commentId);
+
+  if (error) {
+    throw new Error(error.message);
+  }
+  else {
+    console.log('Comment deleted');
+  }
 }

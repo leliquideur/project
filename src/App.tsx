@@ -1,4 +1,5 @@
-/**
+
+{/**
  * The main application component that sets up the routing and authentication context.
  *
  * @component
@@ -26,7 +27,9 @@
  * @see {@link ./components/pages/CreateTicket} for the ticket creation page component.
  * @see {@link ./components/pages/TicketDetail} for the ticket detail page component.
  * @see {@link ./components/components/ProtectedRoute} for the protected route component.
- */
+ */}
+
+ 
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { ProtectedRoute } from './components/ProtectedRoute';
 import { Layout } from './components/Layout/Layout';

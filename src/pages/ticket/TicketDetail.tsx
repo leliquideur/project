@@ -8,6 +8,7 @@ import {
   getUserById,
   getLastStatusHistory,
   fetchTicketData,
+  deleteComment,
 } from "../../api/ticketsService";
 import { getFullNameById } from '../../api/profilesService';
 import { Ticket, Comment, TicketStatusHistory } from "../../types";
@@ -113,6 +114,7 @@ const TicketDetail = () => {
   const maxReplyLength = 1000;
   const authContext = useContext(AuthContext); // Déstructuration pour obtenir user du contexte
   const user = authContext?.user;
+  const currentUserId = user?.id;
 
   const fetchUserNames = async (userIds: string[]) => {
     const uniqueUserIds = Array.from(new Set(userIds));
@@ -240,18 +242,31 @@ const TicketDetail = () => {
     }
   };
 
+const handleDelete = async (commentId: string) => {
+  try {
+    await deleteComment(commentId);
+    // Mettre à jour l'état des commentaires après suppression
+    setComments((prevComments) =>
+      prevComments.filter((comment) => comment.id !== commentId)
+    );
+  } catch (error) {
+    console.error("Erreur lors de la suppression du commentaire:", error);
+    // Optionnel : afficher une notification d'erreur à l'utilisateur
+  }
+};
+
   return (
     <div className="space-y-6">
       <div className="bg-white shadow rounded-lg p-6">
-          {lastStatusHistory && ticket?.status == "resolved" && (
-            <div className="mb-4 p-4 bg-gray-100 border rounded">
-              <h3 className="text-md text-center font-semibold">
-                Ticket résolut le{" "}
-                {new Date(lastStatusHistory.created_at).toLocaleString()} par{" "}
-                {lastStatusHistory.full_name}
-              </h3>
-            </div>
-          )}
+        {lastStatusHistory && ticket?.status == "resolved" && (
+          <div className="mb-4 p-4 bg-gray-100 border rounded">
+            <h3 className="text-md text-center font-semibold">
+              Ticket résolut le{" "}
+              {new Date(lastStatusHistory.created_at).toLocaleString()} par{" "}
+              {lastStatusHistory.full_name}
+            </h3>
+          </div>
+        )}
         <h1 className="text-lg font-medium text-gray-900">
           Détails du Ticket{" "}
           {!(ticket?.status == "resolved") && (
@@ -298,7 +313,7 @@ const TicketDetail = () => {
       )}
       <div className="bg-white shadow rounded-lg p-6">
         <h2 className="text-lg font-medium text-gray-900">Commentaires</h2>
-        {currentComments.map((comment) => (
+        {currentComments.map((comment, index) => (
           <div
             key={comment.id}
             className="mt-4 p-4 border border-gray-200 rounded-lg relative"
@@ -320,6 +335,24 @@ const TicketDetail = () => {
               )}
             </p>
             <p className="mt-1 text-gray-700">{comment.content}</p>
+            {index === 0 &&
+              comment.user_id === currentUserId &&
+              currentPage === 1 && (
+                <button
+                  className="absolute top-0 right-2 mt-0 ml-0 text-red-500 hover:text-red-700"
+                  onClick={async () => {
+                    if (
+                      window.confirm(
+                        "Êtes-vous sûr de vouloir supprimer ce commentaire ?"
+                      )
+                    ) {
+                      await handleDelete(comment.id);
+                    }
+                  }}
+                >
+                  &times;
+                </button>
+              )}
           </div>
         ))}
 
