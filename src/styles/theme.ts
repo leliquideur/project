@@ -1,3 +1,5 @@
+// site tailwindcss : https://tailwindcss.com/docs et aide avec https://flowbite.com/docs/typography/text/#font-size
+
 export const colors = {
   primary: '#3498db',
   secondary: '#2ecc71',
@@ -35,7 +37,7 @@ export const effectsDiv = {
   // ...autres effets
 };
 export const effectsH3 = {
-    title: "text-lg font-extrabold", // Taille et style du titre
+    title: "text-lg font-semibold", // Taille et style du titre
 };
 export const effectsP = {
     value: "text-2xl font-bold",
