@@ -11,7 +11,8 @@
     "signOut": "Sign Out",
     "notifications": "Notifications",
     "role": "Role",
-    "disconected": "Disconnected"
+    "disconected": "Disconnected",
+    "slogan": "When every minute counts."
   },
   "layout": {
       "invalidPath": "Wrong path. You have been redirected to the home page."

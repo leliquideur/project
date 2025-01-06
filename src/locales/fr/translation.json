@@ -11,7 +11,8 @@
     "signOut": "Déconnexion",
     "notifications": "Notifications",
     "role": "Rôle",
-    "disconected": "deconnecté"
+    "disconected": "deconnecté",
+    "slogan": "Quand chaque minute compte."
   },
   "layout": {
       "invalidPath": "Chemin erroné. Vous avez été redirigé vers la page d'accueil."

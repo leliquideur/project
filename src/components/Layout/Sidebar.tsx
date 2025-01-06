@@ -20,14 +20,16 @@ export function Sidebar({ className }: SidebarProps) {
   };
 
   return (
-    <aside className={`bg-gray-900 text-white w-64 min-h-screen p-4 ${className}`}>
+    <aside
+      className={`bg-gray-900 text-white w-64 min-h-screen p-4 ${className}`}
+    >
       <div className="mb-8">
         <img
           src="https://www.heurtiersas.com/images/logo.png"
           alt="Heurtier fiX"
         />
         <h3 className="text-2xl font-bold">Heurtier fiX</h3>
-        <p className="text-sm">Quand chaque minute compte.</p>
+        <p className="text-sm">{t("header.slogan")}</p>
       </div>
       <span className="block h-px bg-gray-700 my-4" />
 
@@ -49,13 +51,17 @@ export function Sidebar({ className }: SidebarProps) {
         <div className="flex gap-2 mt-4">
           <button
             onClick={() => changeLanguage("fr")}
-            className="text-sm text-gray-200 hover:text-white"
+            className={`text-sm text-gray-200 hover:text-white ${
+              i18n.language === "fr" ? "font-extrabold" : ""
+            }`}
           >
             Français
           </button>
           <button
             onClick={() => changeLanguage("en")}
-            className="text-sm text-gray-200 hover:text-white"
+            className={`text-sm text-gray-200 hover:text-white ${
+              i18n.language === "en" ? "font-extrabold" : ""
+            }`}
           >
             English
           </button>
