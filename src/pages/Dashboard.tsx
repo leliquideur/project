@@ -88,8 +88,8 @@ export const Dashboard: React.FC = () => {
           "resolved"
         )}
         {renderStatCard(
-          "Sans filtre",
-          0,
+          "Tous",
+          tickets.length,
           XCircle,
           "text-red-600",
           "bg-purple-50",

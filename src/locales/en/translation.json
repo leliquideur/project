@@ -51,6 +51,22 @@
     "next": "Next"
     
   },
+  "CreateTicket": {
+    "title": "Create Ticket",
+    "subject": "Subject",
+    "description": "Description",
+    "type": "Type",
+    "priority": "Priority",
+    "submit": "Submit",
+    "cancel": "Cancel",
+    "type_problem": "Problem",
+    "type_service_request": "Service Request",
+    "type_task": "Question",
+    "priority_high": "High",
+    "priority_medium": "Medium",
+    "priority_low": "Low",
+    "loading": "Chargement..."
+  },
   "Communt": {
     "title": "Community",
     "newPost": "New Post",

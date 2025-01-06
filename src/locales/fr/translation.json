@@ -51,6 +51,22 @@
     "next": "Suivant",
     "loading": "Chargement..."
   },
+  "CreateTicket": {
+    "title": "Créer un ticket",
+    "subject": "Sujet",
+    "description": "Description",
+    "type": "Type",
+    "priority": "Priorité",
+    "submit": "Soumettre",
+    "cancel": "Annuler",
+    "type_problem": "Problème",
+    "type_service_request": "Demande de service",
+    "type_task": "Question",
+    "priority_high": "Haute",
+    "priority_medium": "Moyenne",
+    "priority_low": "Basse",
+    "loading": "Chargement..."
+  },
   "Communt": {
     "title": "Communauté",
     "newPost": "Nouveau post",

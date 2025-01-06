@@ -8,6 +8,10 @@ import supabase from "../../api/supabaseClient";
 import { getProfileById } from "../../api/profilesService";
 import { useAuth } from '../../hooks/useAuth';
 import { useNavigate } from 'react-router-dom';
+import { TicketPriority, TicketType } from "../../types";
+import { SelectLabel, TextAreaLabel } from "../../components/TextInput";
+import { useTranslation } from "react-i18next";
+
 
 interface User {
   id: string;
@@ -131,12 +135,10 @@ export function CreateTicket() {
   const { user } = useAuth();
   const navigate = useNavigate();
 
-  const [title, setTitle] = useState('');
+  const [title] = useState('');
   const [description, setDescription] = useState('');
-  const [priority, setPriority] = useState<'low' | 'medium' | 'high'>('low');
-  const [type, setType] = useState<"problem" | "task" | "service_request">(
-    "problem"
-  );
+  const [priority] = useState<TicketPriority>("low");
+  const [type, setType] = useState<TicketType>("problem");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -168,7 +170,7 @@ export function CreateTicket() {
         throw error;
       }
 
-      navigate('/tickets');
+      navigate('/dashboard');
     } catch (err: any) {
       console.error('Erreur lors de la création du ticket:', err);
       setError(err.message);
@@ -183,62 +185,67 @@ export function CreateTicket() {
         onSubmit={handleSubmit}
         className="bg-white p-6 rounded shadow-md w-full max-w-md"
       >
-        <h2 className="text-2xl font-bold mb-4">Créer un Ticket</h2>
+        <h2 className="text-2xl font-bold mb-4">{useTranslation().t("CreateTicket.title")}</h2>
 
         {error && <div className="mb-4 text-red-500">{error}</div>}
 
-        <div className="mb-4">
-          <label className="block text-gray-700">Type</label>
-          <select
-            value={type}
-            onChange={(e) =>
-              setType(e.target.value as "problem" | "task" | "service_request")
-            }
-            className="w-full mt-1 p-2 border rounded"
-          >
-            <option value="problem">problem</option>
-            <option value="task">task</option>
-            <option value="service_request">service_request</option>
-          </select>
-        </div>
+        <SelectLabel
+          label={useTranslation().t("CreateTicket.type")}
+          value={type}
+          onChange={(e) => setType(e.target.value as TicketType)}
+          options={[
+            {
+              value: "problem",
+              label: useTranslation().t("CreateTicket.type_problem"),
+            },
+            {
+              value: "task",
+              label: useTranslation().t("CreateTicket.type_task"),
+            },
+            {
+              value: "service_request",
+              label: useTranslation().t("CreateTicket.type_service_request"),
+            },
+          ]}
+          required
+        />
 
-        <div className="mb-4">
-          <label className="block text-gray-700">Titre</label>
-          <input
-            type="text"
-            value={title}
-            onChange={(e) => setTitle(e.target.value)}
-            required
-            className="w-full mt-1 p-2 border rounded"
-            placeholder="Titre du ticket"
-          />
-        </div>
+        <SelectLabel
+          label={useTranslation().t("CreateTicket.priority")}
+          value={type}
+          onChange={(e) => useState(e.target.value as TicketPriority)}
+          options={[
+            {
+              value: "low",
+              label: useTranslation().t("CreateTicket.priority_low"),
+            },
+            {
+              value: "medium",
+              label: useTranslation().t("CreateTicket.priority_medium"),
+            },
+            {
+              value: "high",
+              label: useTranslation().t("CreateTicket.priority_high"),
+            },
+          ]}
+          required
+        />
 
-        <div className="mb-4">
-          <label className="block text-gray-700">Description</label>
-          <textarea
-            value={description}
-            onChange={(e) => setDescription(e.target.value)}
-            required
-            className="w-full mt-1 p-2 border rounded"
-            placeholder="Description détaillée"
-          ></textarea>
-        </div>
+        <TextAreaLabel
+          label={useTranslation().t("CreateTicket.subject")}
+          value={title}
+          onChange={(e) => setDescription(e.target.value)}
+          placeholder="..."
+          required
+        />
 
-        <div className="mb-4">
-          <label className="block text-gray-700">Priorité</label>
-          <select
-            value={priority}
-            onChange={(e) =>
-              setPriority(e.target.value as "low" | "medium" | "high")
-            }
-            className="w-full mt-1 p-2 border rounded"
-          >
-            <option value="low">Faible</option>
-            <option value="medium">Moyenne</option>
-            <option value="high">Haute</option>
-          </select>
-        </div>
+        <TextAreaLabel
+          label={useTranslation().t("CreateTicket.description")}
+          value={description}
+          onChange={(e) => setDescription(e.target.value)}
+          placeholder="..."
+          required
+        />
 
         <button
           type="submit"
@@ -247,7 +254,9 @@ export function CreateTicket() {
             loading ? "bg-gray-400" : "bg-blue-500 hover:bg-blue-600"
           } text-white font-semibold`}
         >
-          {loading ? "Création..." : "Créer le Ticket"}
+          {loading
+            ? useTranslation().t("CreateTicket.loading")
+            : useTranslation().t("CreateTicket.description")}
         </button>
       </form>
     </div>
