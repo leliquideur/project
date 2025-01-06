@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Outlet, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { Sidebar } from './Sidebar';
+import React from 'react';
 
 export function Layout() {
   const location = useLocation();
@@ -37,3 +38,4 @@ export function Layout() {
     </div>
   );
 }
+export default Layout;

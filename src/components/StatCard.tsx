@@ -1,4 +1,5 @@
 import React from "react";
+import { effectsDiv, effectsH3, effectsIcon, effectsOnclic, effectsP} from "../styles/theme";
 
 interface StatCardProps {
   title: string;
@@ -11,20 +12,12 @@ interface StatCardProps {
 
 const StatCard: React.FC<StatCardProps> = ({ title, value, icon: Icon, color, bgColor, onClick }) => {
   return (
-    <div
-      className={`
-        p-4 rounded-lg shadow-md cursor-pointer ${bgColor} 
-        hover:shadow-lg 
-        hover:scale-105 
-        transition-transform 
-        duration-550`}
-      onClick={onClick}
-    >
+    <div className={`${effectsOnclic.effect1} ${bgColor}`} onClick={onClick}>
       <div className="flex items-center">
-        <Icon className={`w-6 h-6 ${color}`} />
-        <div className="ml-4">
-          <h3 className="text-lg font-semibold">{title}</h3>
-          <p className="text-2xl font-bold">{value}</p>
+        <Icon className={`${effectsIcon.taille} ${color}`} />
+        <div className={effectsDiv.marginLeft}>
+          <h3 className={effectsH3.title}>{title}</h3>
+          <p className={effectsP.value}>{value}</p>
         </div>
       </div>
     </div>

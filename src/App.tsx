@@ -45,7 +45,7 @@ import { ProfileDetails } from './pages/profile/ProfileDetails';
 import { Settings } from "./pages/Settings";
 import ErrorBoundary from './components/ErrorBoundary';
 import React from 'react';
-
+import { useAuth } from "./hooks/useAuth";
 
 function App() {
 
@@ -56,6 +56,7 @@ function App() {
         <AuthProvider>
           <Routes>
             <Route path="/" element={<Layout />}>
+              <Route path="/" element={<HomeRedirect />} />
               <Route path="/signup" element={<Signup />} />
               <Route path="/login" element={<Login />} />
 
@@ -80,4 +81,13 @@ function App() {
   );
 }
 
+function HomeRedirect() {
+  const { user, loading } = useAuth();
+
+  if (loading) {
+    return <div>Chargement...</div>;
+  }
+
+  return user ? <Navigate to="/dashboard" /> : <Login />;
+}
 export default App;

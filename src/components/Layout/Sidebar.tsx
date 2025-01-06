@@ -3,6 +3,7 @@ import { LayoutDashboard, Ticket, PlusCircle, Settings, Users, Bell, LogOut } fr
 import { useAuthStore } from '../../store/authStore';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '../../hooks/useAuth';
+import React from 'react';
 
 interface SidebarProps {
   className?: string;
@@ -146,3 +147,4 @@ export function Sidebar({ className }: SidebarProps) {
     </aside>
   );
 }
+export default Sidebar;
