@@ -25,18 +25,18 @@ export const effectsOnclic = {
   // ...autres effets
 };
 export const effectsIcon = {
-    taille: `w-6 h-6`, // Taille icon
+    taille: "w-6 h-6 m-2", // Taille icon
   // ...autres effets
 };
 
 export const effectsDiv = {
-    marginLeft: `"ml-4"`, // Ajout de la marge à gauche
+    marginLeft: "ml-4", // Ajout de la marge à gauche
 
   // ...autres effets
 };
 export const effectsH3 = {
-    title: `"text-lg font-semibold"`, // Taille et style du titre
+    title: "text-lg font-extrabold", // Taille et style du titre
 };
 export const effectsP = {
-    value: `"text-2xl font-bold"`,
+    value: "text-2xl font-bold",
 };
