@@ -35,7 +35,7 @@ export const effectsDiv = {
   // ...autres effets
 };
 export const effectsH3 = {
-    title: `"text-lg font-semibold"`,
+    title: `"text-lg font-semibold"`, // Taille et style du titre
 };
 export const effectsP = {
     value: `"text-2xl font-bold"`,
