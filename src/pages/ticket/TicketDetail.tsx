@@ -17,6 +17,7 @@ import { Ticket, Comment, TicketStatusHistory } from "../../types";
 import TextAreaWithCounter from "../../components/TextAreaWithCounter";
 import { AuthContext } from "../../contexts/AuthContext";
 import { useTranslation } from 'react-i18next';
+import { Loading } from "../../components/loading";
 
 interface ExtendedTicketStatusHistory extends TicketStatusHistory {
   full_name: string;
@@ -223,7 +224,7 @@ const TicketDetail = () => {
     indexOfLastComment
   );
 
-  if (loading) return <div className="text-center py-12">Chargement...</div>;
+  if (loading) return <div className="text-center py-12">{Loading()}</div>;
   if (error)
     return <div className="text-center py-12 text-red-500">{error}</div>;
 

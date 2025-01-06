@@ -4,6 +4,7 @@ import { BarChart3, Clock, AlertCircle, CheckCircle2, XCircle } from "lucide-rea
 import { loadTickets } from '../api/ticketsService';
 import { Ticket } from "../types";
 import StatCard from "../components/StatCard";
+import { Loading } from "../components/loading";
 
 export const Dashboard: React.FC = () => {
   const [tickets, setTickets] = useState<Ticket[]>([]);
@@ -44,7 +45,7 @@ export const Dashboard: React.FC = () => {
   );
 
   if (isLoading) {
-    return <div className="text-center py-12">Chargement...</div>;
+    return <div className="text-center py-12">{Loading()}</div>;
   }
 
   if (error) {

@@ -1,6 +1,8 @@
-import { useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { getProfiles } from '../../api/profilesService';
+import { Loading } from '../../components/loading';
+
 
 export function Profiles() {
   const [profiles, setProfiles] = useState<any[]>([]);
@@ -28,7 +30,7 @@ export function Profiles() {
     : profiles.filter(profile => profile.role === roleFilter);
 
   if (loading) {
-    return <div>Loading...</div>;
+    return Loading();
   }
 
   if (error) {

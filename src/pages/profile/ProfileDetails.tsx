@@ -3,6 +3,7 @@ import { useParams } from 'react-router-dom';
 import { useAuth } from '../../hooks/useAuth';
 import { fetchProfile, handleProfileSubmit } from '../../api/profilesService';
 import { Profile } from "../../types/index";
+import { Loading } from '../../components/loading';
 
 export function ProfileDetails() {
   const { id } = useParams<{ id: string }>();
@@ -58,7 +59,7 @@ export function ProfileDetails() {
     }
   };
 
-  if (authLoading || loading) return <div>Chargement...</div>;
+  if (authLoading || loading) return Loading();
   if (authError) return <div>{authError}</div>;
   if (error) return <div>{error}</div>;
   if (!profile) return <div>Profil non trouvé</div>; // Gérer le cas où le profil est null

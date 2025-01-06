@@ -5,11 +5,12 @@ export const colors = {
   warning: '#f1c40f',
   background: '#f5f5f5',
   text: '#333333',
+  heurtierColor: '#058F95', //récupéré du logo
   // ...autres couleurs
 };
 
 export const effects = {
-    panding:'p-4 ',
+    panding:'p-4',
     rounded:'rounded-lg ',
     shadow:'shadow-md ',
     cursor:'cursor-pointer ',
