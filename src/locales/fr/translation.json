@@ -65,7 +65,14 @@
     "priority_high": "Haute",
     "priority_medium": "Moyenne",
     "priority_low": "Basse",
-    "loading": "Chargement..."
+    "loading": "Chargement...",
+    "success": "Ticket créé avec succès",
+    "error": "Erreur lors de la création du ticket",
+    "descriptionPlaceholder": "Entrez une description pour votre ticket",
+    "subjectPlaceholder": "Entrez un sujet pour votre ticket",
+    "typePlaceholder": "Sélectionnez un type de ticket",
+    "priorityPlaceholder": "Sélectionnez une priorité pour votre ticket",
+    "submitting": "Soumission du ticket en cours..."
   },
   "Communt": {
     "title": "Communauté",

@@ -172,7 +172,7 @@ export function CreateTicket() {
 
       navigate('/dashboard');
     } catch (err: any) {
-      console.error('Erreur lors de la création du ticket:', err);
+      console.error(useTranslation().t("CreateTicket.error"), err);
       setError(err.message);
     } finally {
       setLoading(false);
@@ -185,7 +185,9 @@ export function CreateTicket() {
         onSubmit={handleSubmit}
         className="bg-white p-6 rounded shadow-md w-full max-w-md"
       >
-        <h2 className="text-2xl font-bold mb-4">{useTranslation().t("CreateTicket.title")}</h2>
+        <h2 className="text-2xl font-bold mb-4">
+          {useTranslation().t("CreateTicket.title")}
+        </h2>
 
         {error && <div className="mb-4 text-red-500">{error}</div>}
 
@@ -235,7 +237,7 @@ export function CreateTicket() {
           label={useTranslation().t("CreateTicket.subject")}
           value={title}
           onChange={(e) => setDescription(e.target.value)}
-          placeholder="..."
+          placeholder={useTranslation().t("CreateTicket.subjectPlaceholder")}
           required
         />
 
@@ -243,7 +245,9 @@ export function CreateTicket() {
           label={useTranslation().t("CreateTicket.description")}
           value={description}
           onChange={(e) => setDescription(e.target.value)}
-          placeholder="..."
+          placeholder={useTranslation().t(
+            "CreateTicket.descriptionPlaceholder"
+          )}
           required
         />
 
@@ -255,8 +259,8 @@ export function CreateTicket() {
           } text-white font-semibold`}
         >
           {loading
-            ? useTranslation().t("CreateTicket.loading")
-            : useTranslation().t("CreateTicket.description")}
+            ? useTranslation().t("CreateTicket.submitting")
+            : useTranslation().t("CreateTicket.submit")}
         </button>
       </form>
     </div>
