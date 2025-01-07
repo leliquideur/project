@@ -3,6 +3,8 @@ import { useTranslation } from 'react-i18next';
 import { useNavigate } from "react-router-dom";
 import { loadTicketsWithPagination } from '../../api/ticketsService';
 import { Ticket } from "../../types";
+import { Loading } from "../../components/loading";
+
 
 export function TicketList() {
   const { t } = useTranslation();
@@ -53,7 +55,7 @@ export function TicketList() {
   };
 
   if (loading) {
-    return <div>{t("Ticket.loading")}</div>;
+    return Loading();
   }
 
   if (error) {
