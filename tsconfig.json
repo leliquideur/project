@@ -1,15 +1,16 @@
 {
   "compilerOptions": {
-    "target": "ESNext",
+    "target": "es6",
     "module": "ESNext",
     "moduleResolution": "node",
     "jsx": "react",
     "esModuleInterop": true,
     "forceConsistentCasingInFileNames": true,
     "strict": true,
-    "skipLibCheck": true
+    "skipLibCheck": true,
+    "outDir": "dist" // Ajouté
     // ... autres options ...
   },
-  "include": ["src"],
+  "include": ["src","server"],
   "exclude": ["node_modules"]
 }

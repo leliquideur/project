@@ -1,10 +1,11 @@
+import React from 'react';
 import type { TicketStatus } from '../../types';
 
 const statusColors: Record<TicketStatus, { bg: string; text: string }> = {
   new: { bg: 'bg-blue-100', text: 'text-blue-800' },
-  assigned: { bg: 'bg-yellow-100', text: 'text-yellow-800' },
+  //assigned: { bg: 'bg-yellow-100', text: 'text-yellow-800' },
   in_progress: { bg: 'bg-purple-100', text: 'text-purple-800' },
-  on_hold: { bg: 'bg-orange-100', text: 'text-orange-800' },
+  //on_hold: { bg: 'bg-orange-100', text: 'text-orange-800' },
   resolved: { bg: 'bg-green-100', text: 'text-green-800' },
   closed: { bg: 'bg-gray-100', text: 'text-gray-800' },
 };
