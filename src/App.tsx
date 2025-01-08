@@ -46,7 +46,7 @@ import { Settings } from "./pages/Settings";
 import ErrorBoundary from './components/ErrorBoundary';
 import React from 'react';
 import { useAuth } from "./hooks/useAuth";
-import { Loading } from "./components/loading";
+import { Loading } from "./components/Loading";
 
 function App() {
 
