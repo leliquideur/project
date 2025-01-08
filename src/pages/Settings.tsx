@@ -10,7 +10,7 @@ export function Settings() {
         },
       });
       if (response.ok) {
-        alert("Email envoyé avec succès !");
+        console.log("Email envoyé avec succès !");
       } else {
         alert("Échec de l'envoi de l'email.");
       }
