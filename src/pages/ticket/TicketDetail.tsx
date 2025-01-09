@@ -18,6 +18,7 @@ import TextAreaWithCounter from "../../components/TextAreaWithCounter";
 import { AuthContext } from "../../contexts/AuthContext";
 import { useTranslation } from 'react-i18next';
 import { Loading } from "../../components/Loading";
+import { postCommentReplyAndNotify } from "../../services/emailService";
 
 interface ExtendedTicketStatusHistory extends TicketStatusHistory {
   full_name: string;
@@ -192,25 +193,29 @@ const TicketDetail = () => {
     setReplyText(text);
   };
 
-  const handleReplySubmit = async () => {
+  const handleReplySubmit = async (replyContent: string) => {
     if (!replyText) return;
-
+    setLoading(true);
+  
     try {
-      await postCommentReply(id!, replyText, user?.id || "");
+      await postCommentReplyAndNotify(id!, replyText, user?.id || "");
       await refreshComments();
+      setReplyText("");
+  
       if (comments.length === 0 && ticket?.status === "new") {
         if (ticket?.id && user?.id) {
-          console.log("Starting progress for ticket", ticket.id);
-          console.log("User ID", user.id);
           await startProgress(ticket.id, user.id);
           setRefresh(!refresh);
         }
       }
-    } catch (err: any) {
-      console.error(err);
-      setError("Erreur lors de l'envoi de la réponse.");
+    } catch (error) {
+      console.error("Erreur lors de la réponse:", error);
+      setError("Erreur lors de l'envoi du commentaire");
+    } finally {
+      setLoading(false);
     }
   };
+  
 
   // Fonction pour gérer le changement de page
   const handlePageChange = (pageNumber: number) => {
@@ -333,7 +338,7 @@ const TicketDetail = () => {
           />
           <button
             className="mt-2 px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
-            onClick={handleReplySubmit}
+            onClick={() => handleReplySubmit(replyText)}
           >
             {t("TicketDetail.reply")}
           </button>
@@ -412,3 +417,4 @@ const TicketDetail = () => {
 };
 
 export default TicketDetail;
+
