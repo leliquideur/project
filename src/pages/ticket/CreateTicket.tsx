@@ -4,8 +4,8 @@ import React, {
   useState,
   ReactNode,
 } from "react";
-import supabase from "../../api/supabaseClient";
-import { getProfileById } from "../../api/profilesService";
+import supabase from "../../services/supabaseClient";
+import { getProfileById } from "../../services/profilesService";
 import { useAuth } from '../../hooks/useAuth';
 import { useNavigate } from 'react-router-dom';
 import { TicketPriority, TicketType } from "../../types";
@@ -80,7 +80,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     fetchUser();
 
     const { data: authListener } = supabase.auth.onAuthStateChange(
-      (event, session) => {
+      (event: string) => {
         if (event === "SIGNED_IN" || event === "SIGNED_OUT") {
           fetchUser();
         }

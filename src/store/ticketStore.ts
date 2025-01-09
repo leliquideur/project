@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import supabase from '../api/supabaseClient';
+import supabase from '../services/supabaseClient';
 import type { Ticket } from '../types';
 
 interface TicketState {

@@ -405,3 +405,20 @@ export async function deleteComment(commentId: string): Promise<void> {
     console.log('Comment deleted');
   }
 }
+
+export async function updateTicket(ticket: Ticket): Promise<void> {
+  const { error } = await supabase
+    .from('tickets')
+    .update({
+      title: ticket.title,
+      description: ticket.description,
+      priority: ticket.priority,
+      type: ticket.type,
+      assigned_to: ticket.assigned_to,
+    })
+    .eq('id', ticket.id);
+
+  if (error) {
+    throw new Error(error.message);
+  }
+}

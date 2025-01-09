@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { BarChart3, Clock, AlertCircle, CheckCircle2, XCircle } from "lucide-react";
-import { loadTickets } from '../api/ticketsService';
+import { loadTickets } from '../services/ticketsService';
 import { Ticket } from "../types";
 import StatCard from "../components/StatCard";
-import { Loading } from "../components/loading";
+import { Loading } from "../components/Loading";
 
 export const Dashboard: React.FC = () => {
   const [tickets, setTickets] = useState<Ticket[]>([]);

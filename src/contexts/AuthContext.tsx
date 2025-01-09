@@ -5,8 +5,8 @@ import React, {
   useState,
   ReactNode,
 } from "react";
-import supabase from "../api/supabaseClient";
-import { getProfileById } from "../api/profilesService";
+import supabase from "../services/supabaseClient";
+import { getProfileById } from "../services/profilesService";
 
 interface User {
   id: string;

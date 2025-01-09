@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from "react";
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from "react-router-dom";
-import { loadTicketsWithPagination } from '../../api/ticketsService';
+import { loadTicketsWithPagination } from '../../services/ticketsService';
 import { Ticket } from "../../types";
-import { Loading } from "../../components/loading";
+import { Loading } from "../../components/Loading";
 
 
 export function TicketList() {

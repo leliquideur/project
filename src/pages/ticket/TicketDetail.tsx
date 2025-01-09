@@ -11,13 +11,13 @@ import {
   deleteComment,
   startProgress,
   handleCloseTicket,
-} from "../../api/ticketsService";
-import { getFullNameById } from "../../api/profilesService";
+} from "../../services/ticketsService";
+import { getFullNameById } from "../../services/profilesService";
 import { Ticket, Comment, TicketStatusHistory } from "../../types";
 import TextAreaWithCounter from "../../components/TextAreaWithCounter";
 import { AuthContext } from "../../contexts/AuthContext";
 import { useTranslation } from 'react-i18next';
-import { Loading } from "../../components/loading";
+import { Loading } from "../../components/Loading";
 
 interface ExtendedTicketStatusHistory extends TicketStatusHistory {
   full_name: string;

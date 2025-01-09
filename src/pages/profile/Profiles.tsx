@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { getProfiles } from '../../api/profilesService';
-import { Loading } from '../../components/loading';
+import { getProfiles } from '../../services/profilesService';
+import { Loading } from '../../components/Loading';
 
 
 export function Profiles() {

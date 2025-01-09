@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { useAuth } from '../../hooks/useAuth';
-import { fetchProfile, handleProfileSubmit } from '../../api/profilesService';
+import { fetchProfile, handleProfileSubmit } from '../../services/profilesService';
 import { Profile } from "../../types/index";
-import { Loading } from '../../components/loading';
+import { Loading } from '../../components/Loading';
 
 export function ProfileDetails() {
   const { id } = useParams<{ id: string }>();

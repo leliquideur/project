@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import { useTranslation } from 'react-i18next';
-import supabase from "../../api/supabaseClient";
+import supabase from "../../services/supabaseClient";
 
 export function Login() {
   const { t } = useTranslation();

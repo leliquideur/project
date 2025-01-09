@@ -1,5 +1,5 @@
 import { useEffect } from 'react';
-import supabase from '../api/supabaseClient';
+import supabase from '../services/supabaseClient';
 import { useTicketStore } from '../store/ticketStore';
 
 export function useTicketSubscription() {
